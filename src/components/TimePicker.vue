@@ -67,11 +67,18 @@ function confirm() {
 </template>
 
 <style scoped>
-.slot-group { margin-bottom: 12px; }
-.g-label { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+.slot-group { margin-bottom: 14px; }
+.g-label { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; font-weight: 500; }
 .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.slot { padding: 9px 0; border-radius: 9px; border: 1px solid var(--line-strong); font-size: 14px; background: var(--card); font-variant-numeric: tabular-nums; }
-.slot.on { border-color: var(--brand); background: var(--brand-tint); color: var(--brand-deep); font-weight: 600; }
+.slot {
+  padding: 10px 0; border-radius: 13px; border: 1.5px solid transparent;
+  font-size: 14px; background: var(--fill); font-variant-numeric: tabular-nums;
+  color: var(--ink-2); font-weight: 500; transition: all .15s;
+}
+.slot.on {
+  border-color: var(--brand-line); background: rgba(255, 246, 238, .96); color: var(--brand-ink);
+  font-weight: 700; box-shadow: 0 5px 12px rgba(255, 102, 0, .12);
+}
 .slot.outside { color: var(--ink-3); }
 .outside { margin-top: 4px; }
 summary { cursor: pointer; }

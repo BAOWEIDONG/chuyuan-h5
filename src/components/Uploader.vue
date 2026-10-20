@@ -73,7 +73,7 @@ function remove(i) {
     </div>
 
     <div v-if="samples.length && files.length < max" class="samples">
-      <span class="tiny muted">演示可一键使用：</span>
+      <span class="tiny muted">可使用示例：</span>
       <button v-for="s in samples" :key="s" class="sample-chip" @click="useSample(s)">{{ s }}</button>
     </div>
 
@@ -83,20 +83,34 @@ function remove(i) {
 </template>
 
 <style scoped>
-.uploader { padding: 4px 0; }
+.uploader { padding: 2px 0; }
 .up-head { display: flex; align-items: flex-start; gap: 10px; }
-.up-title { font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-.req { font-size: 10.5px; color: var(--seal); border: 1px solid rgba(179,58,43,.4); padding: 0 4px; border-radius: 4px; font-weight: 500; }
-.up-desc { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
-.up-count { margin-left: auto; font-size: 12px; color: var(--ink-3); flex: none; }
-.thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.thumb { position: relative; width: 76px; height: 76px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #F1EEE7; }
+.up-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.req {
+  font-size: 10px; color: var(--brand-ink); background: var(--brand-tint);
+  padding: 2px 6px; border-radius: 6px; font-weight: 600;
+}
+.up-desc { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.55; }
+.up-count { margin-left: auto; font-size: 11.5px; color: var(--ink-3); flex: none; background: var(--fill); padding: 2px 8px; border-radius: 8px; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+.thumb { position: relative; width: 78px; height: 78px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--fill); }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .thumb-doc { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink-3); font-size: 9.5px; padding: 4px; text-align: center; }
 .thumb-doc span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-.thumb-del { position: absolute; top: 3px; right: 3px; width: 19px; height: 19px; border-radius: 50%; background: rgba(20,30,35,.6); color: #fff; display: grid; place-items: center; }
-.add { width: 76px; height: 76px; border-radius: 10px; border: 1px dashed var(--line-strong); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: var(--ink-3); background: #FBFAF6; }
-.add:disabled { opacity: .6; }
-.samples { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.sample-chip { font-size: 11.5px; color: var(--brand-deep); background: var(--brand-tint); padding: 4px 9px; border-radius: 6px; }
+.thumb-del {
+  position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(20, 24, 30, .58); color: #fff; display: grid; place-items: center;
+  backdrop-filter: blur(4px);
+}
+.add {
+  width: 78px; height: 78px; border-radius: 14px; border: 1.5px dashed rgba(60, 60, 67, .18);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: 11px; color: var(--ink-3); background: var(--fill);
+}
+.add:disabled { opacity: .55; }
+.samples { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+.sample-chip {
+  font-size: 11.5px; color: var(--brand-ink); background: var(--brand-tint);
+  padding: 5px 10px; border-radius: 10px; font-weight: 500;
+}
 </style>

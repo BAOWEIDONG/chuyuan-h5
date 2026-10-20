@@ -97,7 +97,7 @@ const FAQ = [
         <div v-if="cityResult" class="city-result" :class="cityResult.ok ? 'ok' : 'no'">
           <Icon :name="cityResult.ok ? 'check' : 'close'" :size="16" />
           <span v-if="cityResult.ok">{{ cityResult.city }} 已开通，服务范围为其市辖区</span>
-          <span v-else>{{ cityResult.city }} 暂未开通，可拨打 95511-7 查询最新服务城市</span>
+          <span v-else>{{ cityResult.city }} 暂未开通，可拨打 400-820-8866 查询最新服务城市</span>
         </div>
         <p class="tiny muted" style="margin:10px 0 0">服务覆盖市辖区，不含下辖县、县级市（江苏、浙江、重庆部分区域除外）；不含港澳台及境外。</p>
       </div>
@@ -115,7 +115,7 @@ const FAQ = [
 
       <div class="contact">
         <div class="c-t">还有其他问题</div>
-        <a class="c-btn" href="tel:955117"><Icon name="phone" :size="15" /> 客服热线 95511-7</a>
+        <a class="c-btn" href="tel:4008208866"><Icon name="phone" :size="15" /> 客服热线 400-820-8866</a>
         <p class="tiny muted" style="margin-top:8px">工作日 9:00–21:00</p>
       </div>
     </div>
@@ -128,32 +128,39 @@ const FAQ = [
 </template>
 
 <style scoped>
-.rules { padding-top: 8px; }
-.intro { padding: 16px 4px 4px; }
-.intro-p { font-size: 13.5px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.7; }
-.intro-tags { display: flex; gap: 6px; margin-top: 12px; }
-.intro-tags span { font-size: 11px; color: var(--brand-deep); background: var(--brand-tint); padding: 3px 8px; border-radius: 5px; }
-.rules-card { padding: 6px 16px; }
-.rl { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.rules { padding-top: 6px; }
+.intro { padding: 16px 2px 4px; }
+.intro-p { font-size: 13.5px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.75; }
+.intro-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.intro-tags span { font-size: 11px; color: var(--brand-ink); background: var(--brand-tint); padding: 4px 10px; border-radius: 8px; font-weight: 600; }
+.rules-card { padding: 4px 16px; }
+.rl { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .rl:last-child { border-bottom: 0; }
-.rn { font-family: var(--serif); font-size: 13px; color: #C0B7A3; font-weight: 700; flex: none; width: 20px; padding-top: 1px; }
-.rl b { font-size: 13.5px; font-weight: 600; }
-.rl p { font-size: 12.5px; color: var(--ink-2); margin: 3px 0 0; line-height: 1.6; }
-.sv-h { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; }
-.sv-h svg { color: var(--brand); }
-.sv p { font-size: 12.5px; color: var(--ink-2); line-height: 1.7; margin: 6px 0 0; }
-.no-card p { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; margin: 0; }
-.city-result { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; }
-.city-result.ok { background: var(--brand-tint); color: var(--brand-deep); }
-.city-result.no { background: var(--seal-tint); color: #7C2A1F; }
-.faq { padding: 4px 16px; }
-.faq-item { display: block; width: 100%; text-align: left; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.rn {
+  width: 22px; height: 22px; border-radius: 8px; flex: none; margin-top: 1px;
+  font-size: 11px; font-weight: 700; color: var(--brand-ink); background: var(--brand-tint);
+  display: grid; place-items: center;
+}
+.rl b { font-size: 13.5px; font-weight: 700; }
+.rl p { font-size: 12.5px; color: var(--ink-2); margin: 4px 0 0; line-height: 1.65; }
+.sv-h { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; }
+.sv-h svg { color: var(--green); }
+.sv p { font-size: 12.5px; color: var(--ink-2); line-height: 1.75; margin: 7px 0 0; }
+.no-card p { font-size: 12.5px; color: var(--ink-2); line-height: 1.85; margin: 0; }
+.city-result { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 11px 13px; border-radius: 12px; font-size: 12.5px; font-weight: 500; }
+.city-result.ok { background: var(--green-tint); color: var(--green-deep); }
+.city-result.no { background: var(--red-tint); color: #B3311F; }
+.faq { padding: 2px 16px; }
+.faq-item { display: block; width: 100%; text-align: left; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .faq-item:last-child { border-bottom: 0; }
-.fq { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; line-height: 1.5; }
-.fq-chev { color: #C3C9CB; flex: none; transition: transform .18s; }
-.faq-item.open .fq-chev { transform: rotate(90deg); }
-.fa { font-size: 12.5px; color: var(--ink-2); line-height: 1.75; margin: 8px 0 0; }
-.contact { text-align: center; margin-top: 28px; padding: 18px 0 8px; }
+.fq { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; line-height: 1.55; font-weight: 500; }
+.fq-chev { color: rgba(60, 60, 67, .26); flex: none; transition: transform .18s; }
+.faq-item.open .fq-chev { transform: rotate(90deg); color: var(--brand); }
+.fa { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; margin: 9px 0 0; }
+.contact { text-align: center; margin-top: 26px; padding: 18px 0 8px; }
 .c-t { font-size: 13px; color: var(--ink-2); }
-.c-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 9px 18px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 13.5px; color: var(--ink); }
+.c-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 11px; padding: 10px 20px; border-radius: 20px;
+  background: var(--grad); color: #fff; font-size: 13.5px; font-weight: 600; box-shadow: 0 8px 18px rgba(255, 90, 0, .24);
+}
 </style>

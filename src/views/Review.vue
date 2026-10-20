@@ -52,7 +52,7 @@ function submit(skip = false) {
 
       <div class="stars">
         <button v-for="n in 5" :key="n" class="star-btn" :aria-label="`${n} 星`" @click="rating = n">
-          <Icon name="star" :size="34" :style="{ color: n <= rating ? '#D9A03C' : '#DCD7CC' }" />
+          <Icon name="star" :size="34" :style="{ color: n <= rating ? '#FF8A1F' : 'rgba(60,60,67,.16)' }" />
         </button>
       </div>
       <div class="rating-text">{{ ratingText }}</div>
@@ -78,28 +78,34 @@ function submit(skip = false) {
 
       <div class="comp">
         <div class="comp-t small">服务有问题？</div>
-        <div class="comp-d tiny muted">可拨打 95511-7 反馈，平台将在 1 个工作日内联系你。</div>
+        <div class="comp-d tiny muted">可拨打 400-820-8866 反馈，平台将在 1 个工作日内联系你。</div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.rv-head { padding: 24px 4px 0; text-align: center; }
-.rv-title { font-family: var(--serif); font-size: 21px; font-weight: 700; }
-.rv-sub { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
-.stars { display: flex; justify-content: center; gap: 8px; margin-top: 26px; }
-.star-btn { padding: 4px; }
-.rating-text { text-align: center; font-size: 13px; color: var(--ink-2); height: 20px; margin-top: 8px; }
-.tag-block { margin-top: 26px; }
+.rv-head { padding: 26px 4px 0; text-align: center; }
+.rv-title { font-size: 21px; font-weight: 800; line-height: 1.4; }
+.rv-sub { font-size: 12.5px; color: var(--ink-3); margin-top: 7px; }
+.stars { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+.star-btn { padding: 4px; transition: transform .12s ease; }
+.star-btn:active { transform: scale(.9); }
+.rating-text { text-align: center; font-size: 13px; color: var(--brand-ink); height: 20px; margin-top: 10px; font-weight: 600; }
+.tag-block { margin-top: 24px; }
 .tb-title { margin-bottom: 10px; }
-.note-block { margin-top: 20px; position: relative; }
-.note { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 12px 14px 26px; font-size: 14px; line-height: 1.6; outline: none; resize: none; font-family: inherit; }
-.note:focus { border-color: var(--brand); }
-.count { position: absolute; right: 12px; bottom: 8px; }
-.rv-actions { margin-top: 26px; display: grid; gap: 6px; }
+.note-block { margin-top: 18px; position: relative; }
+.note {
+  width: 100%; border: 1px solid rgba(255, 255, 255, .95); border-radius: 18px;
+  background: var(--card); padding: 13px 15px 28px; font-size: 14px; line-height: 1.65;
+  outline: none; resize: none; font-family: inherit; box-shadow: var(--shadow-sm); color: var(--ink);
+}
+.note:focus { border-color: var(--brand-line); }
+.note::placeholder { color: var(--ink-3); }
+.count { position: absolute; right: 14px; bottom: 10px; }
+.rv-actions { margin-top: 26px; display: grid; gap: 8px; }
 .skip { padding: 10px; text-align: center; }
-.comp { margin-top: 30px; text-align: center; padding: 14px; border-top: 1px solid var(--line); }
+.comp { margin-top: 26px; text-align: center; padding: 16px; border-top: 1px solid var(--line); }
 .comp-t { color: var(--ink-2); }
 .comp-d { margin-top: 4px; line-height: 1.6; }
 </style>

@@ -12,7 +12,7 @@ const ROUTES = [
   ['/address', '家庭常住地'],
   ['/rules', '服务规则'],
   ['/messages', '消息'],
-  ['/demo', '演示控制台'],
+  ['/demo', '平台操作台'],
   ['/order/X', '订单详情']
 ]
 

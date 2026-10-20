@@ -9,7 +9,6 @@ import AddressPicker from '../components/AddressPicker.vue'
 import DatePicker from '../components/DatePicker.vue'
 import TimePicker from '../components/TimePicker.vue'
 import Stepper from '../components/Stepper.vue'
-import PickerSheet from '../components/PickerSheet.vue'
 import { draft, recomputeTrip } from '../store/draft.js'
 import { store } from '../store/orders.js'
 import { session } from '../store/session.js'
@@ -28,10 +27,10 @@ const admissionOpen = ref(false)
 const dischargeOpen = ref(false)
 const travelOpen = ref(false)
 const timeOpen = ref(false)
-const contactOpen = ref(false)
 const vehicleOpen = ref(false)
 
 const errors = ref({})
+const showErr = ref(false)  // 进页面不飘红，点下一步后才提示
 
 /* ---------- 日期候选 ---------- */
 const today = new Date()
@@ -112,21 +111,9 @@ function toggleNeed(v) {
 const phoneValid = computed(() => /^1[3-9]\d{9}$/.test(draft.contactPhone || ''))
 
 /* ---------- 联系人 ---------- */
-const contactType = ref('self')
-const contactOptions = [
-  { value: 'self', label: '本人', desc: '使用被保险人预留手机号' },
-  { value: 'family', label: '家属', desc: '填写家属姓名与手机号' }
-]
-watch(contactType, (v) => {
-  if (v === 'self') {
-    draft.contactName = session.member?.memberName || ''
-    draft.contactPhone = session.member?.mobile || ''
-  } else {
-    draft.contactName = ''
-    draft.contactPhone = ''
-  }
-  validate()
-}, { immediate: true })
+// 只有被保险人本人使用本服务，联系电话直接取保单预留手机号
+draft.contactName = session.member?.memberName || ''
+draft.contactPhone = session.member?.mobile || ''
 
 
 /* ---------- 校验 ---------- */
@@ -153,9 +140,7 @@ function validate() {
   if (!draft.travelTime) e.time = '请选择出行时间'
   const pe = checkPassengers(draft.tripType, draft.passengerCount)
   if (pe) e.passenger = pe.text
-  if (!draft.contactName) e.contact = '请填写联系人'
-  if (!draft.contactPhone) e.contact = '请填写手机号'
-  else if (!phoneValid.value) e.contact = '手机号格式不正确'
+  if (!phoneValid.value) e.contact = '保单预留手机号有误，请联系客服更新'
   errors.value = e
   return Object.keys(e).length === 0
 }
@@ -165,6 +150,7 @@ const valid = computed(() => Object.keys(errors.value).length === 0)
 
 function next() {
   if (!validate()) {
+    showErr.value = true
     const first = document.querySelector('.err-anchor')
     first?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     return
@@ -183,28 +169,28 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
 
       <!-- 医院 -->
       <div class="section-title"><span class="t">就诊与住院</span><span class="s">按出院小结填写</span></div>
-      <div class="card" style="padding:4px 16px">
-        <button class="field" :class="{ err: errors.hospital }" @click="hospitalOpen = true">
+      <div class="card" style="padding:2px 16px">
+        <button class="field" :class="{ err: showErr && errors.hospital }" @click="hospitalOpen = true">
           <span class="label">就诊医院</span>
           <span class="value" :class="{ placeholder: !hospital }">
             {{ hospital ? hospital.name : '搜索选择医院' }}
             <span v-if="hospital" class="hint">{{ hospital.city }}{{ hospital.district }} · {{ hospLevel }}</span>
-            <span v-if="errors.hospital" class="hint" style="color:var(--seal)">{{ errors.hospital }}</span>
+            <span v-if="showErr && errors.hospital" class="hint" style="color:var(--seal)">{{ errors.hospital }}</span>
           </span>
           <Icon class="chev" name="chevron" :size="17" />
         </button>
 
-        <button class="field" :class="{ err: errors.admission }" @click="admissionOpen = true">
+        <button class="field" :class="{ err: showErr && errors.admission }" @click="admissionOpen = true">
           <span class="label">入院日期</span>
           <span class="value" :class="{ placeholder: !draft.admissionDate }">{{ draft.admissionDate || '选择日期' }}</span>
           <Icon class="chev" name="calendar" :size="17" />
         </button>
 
-        <button class="field" :class="{ err: errors.discharge }" @click="draft.admissionDate && (dischargeOpen = true)">
+        <button class="field" :class="{ err: showErr && errors.discharge }" @click="draft.admissionDate && (dischargeOpen = true)">
           <span class="label">出院日期</span>
           <span class="value" :class="{ placeholder: !draft.dischargeDate }">
             {{ draft.dischargeDate || '选择日期' }}
-            <span v-if="errors.discharge" class="hint" style="color:var(--seal)">{{ errors.discharge }}</span>
+            <span v-if="showErr && errors.discharge" class="hint" style="color:var(--seal)">{{ errors.discharge }}</span>
             <span v-else-if="!draft.admissionDate" class="hint">请先选择入院日期</span>
           </span>
           <Icon class="chev" name="calendar" :size="17" />
@@ -213,8 +199,8 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
 
       <!-- 目的地 -->
       <div class="section-title"><span class="t">目的地</span><span class="s">仅支持家庭常住地</span></div>
-      <div class="card" style="padding:4px 16px">
-        <button class="field" :class="{ err: errors.address }" @click="addressOpen = true">
+      <div class="card" style="padding:2px 16px">
+        <button class="field" :class="{ err: showErr && errors.address }" @click="addressOpen = true">
           <span class="label">家庭常住地</span>
           <span class="value" :class="{ placeholder: !address }">
             <template v-if="address">
@@ -222,7 +208,7 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
               <span class="hint">{{ address.community }}{{ address.detail }}</span>
             </template>
             <template v-else>选择或登记地址</template>
-            <span v-if="errors.address" class="hint" style="color:var(--seal)">{{ errors.address }}</span>
+            <span v-if="showErr && errors.address" class="hint" style="color:var(--seal)">{{ errors.address }}</span>
           </span>
           <span v-if="address" class="badge muted">已登记</span>
           <Icon v-else class="chev" name="chevron" :size="17" />
@@ -234,23 +220,23 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
 
       <!-- 行程 -->
       <div class="section-title"><span class="t">出行安排</span><span class="s" v-if="tripLabel">{{ tripLabel }} · 测算 {{ draft.distanceKm }} 公里</span></div>
-      <div class="card" style="padding:4px 16px">
-        <button class="field" :class="{ err: errors.travel }" @click="travelDates.length && (travelOpen = true)">
+      <div class="card" style="padding:2px 16px">
+        <button class="field" :class="{ err: showErr && errors.travel }" @click="travelDates.length && (travelOpen = true)">
           <span class="label">出行日期</span>
           <span class="value" :class="{ placeholder: !draft.travelDate }">
             {{ draft.travelDate ? draft.travelDate + '（' + ['周日','周一','周二','周三','周四','周五','周六'][parseYmd(draft.travelDate).getDay()] + '）' : '选择日期' }}
-            <span v-if="errors.travel" class="hint" style="color:var(--seal)">{{ errors.travel }}</span>
+            <span v-if="showErr && errors.travel" class="hint" style="color:var(--seal)">{{ errors.travel }}</span>
             <span v-else-if="!draft.dischargeDate" class="hint">选好出院日期后可选择</span>
             <span v-else class="hint">限出院当天及之后 2 个自然日内</span>
           </span>
           <Icon class="chev" name="calendar" :size="17" />
         </button>
 
-        <button class="field" :class="{ err: errors.time }" @click="timeOpen = true">
+        <button class="field" :class="{ err: showErr && errors.time }" @click="timeOpen = true">
           <span class="label">出行时间</span>
           <span class="value" :class="{ placeholder: !draft.travelTime }">
             {{ draft.travelTime || '选择时间' }}
-            <span v-if="errors.time" class="hint" style="color:var(--seal)">{{ errors.time }}</span>
+            <span v-if="showErr && errors.time" class="hint" style="color:var(--seal)">{{ errors.time }}</span>
           </span>
           <Icon class="chev" name="clock" :size="17" />
         </button>
@@ -284,24 +270,21 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
         </p>
       </div>
 
-      <!-- 联系人 -->
-      <div class="section-title"><span class="t">联系人</span><span class="s">用于服务商确认行程</span></div>
-      <div class="card" style="padding:4px 16px">
-        <button class="field" @click="contactOpen = true">
+      <!-- 联系人：被保险人本人，手机号取自保单 -->
+      <div class="section-title"><span class="t">联系电话</span><span class="s">服务商联系你时使用</span></div>
+      <div class="card" style="padding:2px 16px">
+        <div class="field">
           <span class="label">联系人</span>
-          <span class="value">{{ contactType === 'self' ? '本人' : '家属' }}</span>
-          <Icon class="chev" name="chevron" :size="17" />
-        </button>
-        <div v-if="contactType === 'family'" class="field">
-          <span class="label">姓名</span>
-          <input v-model="draft.contactName" class="value input" placeholder="填写家属姓名" maxlength="12" />
+          <span class="value">{{ session.member?.memberName || '本人' }}<span class="hint">被保险人本人</span></span>
         </div>
-        <div class="field" :class="{ err: errors.contact }">
+        <div class="field">
           <span class="label">手机号</span>
-          <input v-model="draft.contactPhone" class="value input" placeholder="填写 11 位手机号" inputmode="numeric" maxlength="11" />
+          <span class="value num">{{ draft.contactPhone || session.member?.mobile }}</span>
         </div>
-        <p v-if="errors.contact" class="tiny" style="color:var(--seal);padding:8px 0">{{ errors.contact }}</p>
       </div>
+      <p class="tiny muted" style="margin:10px 4px 0;line-height:1.7">
+        手机号取自保单预留号码。如已变更，请联系平台客服更新后再预约。
+      </p>
 
       <p class="tiny muted" style="margin:22px 4px 0;line-height:1.7">
         行程仅支持从本次住院医院单次直达家庭常住地，不支持绕行、多点停靠、中途停留或变更目的地。
@@ -309,7 +292,7 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
     </div>
 
     <div class="action-bar">
-      <button class="btn btn-primary" :disabled="!valid" @click="next">
+      <button class="btn" :class="valid ? 'btn-primary' : 'btn-wait'" @click="next">
         {{ valid ? '下一步' : '请完成必填项' }}
       </button>
     </div>
@@ -323,12 +306,10 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
     <DatePicker v-model:open="travelOpen" title="选择出行日期" :dates="travelDates" :model-value="draft.travelDate"
                 disabled-hint="仅限出院当天及之后 2 个自然日内" @update:model-value="pickTravel" />
     <TimePicker v-model:open="timeOpen" :model-value="draft.travelTime" @update:model-value="v => (draft.travelTime = v, validate())" />
-    <PickerSheet v-model:open="contactOpen" title="选择联系人" :options="contactOptions" :model-value="contactType"
-                 :searchable="false" @update:model-value="v => contactType = v" />
   </div>
 </template>
 
 <style scoped>
-.input { border: 0; outline: none; background: transparent; font-size: 15px; padding: 0; }
-.input::placeholder { color: #A9B2B6; }
+.input { border: 0; outline: none; background: transparent; font-size: 15.5px; padding: 0; min-width: 0; }
+.input::placeholder { color: var(--ink-3); font-weight: 400; }
 </style>

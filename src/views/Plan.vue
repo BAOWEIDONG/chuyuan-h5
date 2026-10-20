@@ -71,6 +71,15 @@ function goNext() {
 <template>
   <div>
     <NavBar title="方案确认" back="/book" />
+    <!-- 演示兜底：直接打开本页时没有里程数据，给出明确提示 -->
+    <div v-if="!draft.distanceKm" class="page" style="padding-top:16px">
+      <div class="empty" style="padding-top:80px">
+        <div class="t">还没有填写行程信息</div>
+        <div class="small">请先完成医院、出院日期与家庭常住地</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:18px;display:inline-flex" @click="router.push('/book')">去填写</button>
+      </div>
+    </div>
+    <template v-else>
     <div class="page with-bar">
       <ProgressDots :total="4" :current="2" :labels="['预约信息', '车型确认', '材料上传', '提交']" />
 
@@ -193,36 +202,51 @@ function goNext() {
                  :searchable="false" @update:model-value="v => (ticketType = v, seatClass = v === 'train' ? '二等座' : '经济舱')" />
     <PickerSheet v-model:open="seatSheet" title="选择座席" :options="seatOptions" :model-value="seatClass"
                  :searchable="false" @update:model-value="v => seatClass = v" />
+    </template>
   </div>
 </template>
 
 <style scoped>
-.dist-card { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
-.dc-head { display: flex; align-items: center; gap: 8px; }
-.dc-tag { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 5px; background: var(--brand-tint); color: var(--brand-deep); }
-.dc-tag.long { background: #EDE7F4; color: #5B4380; }
-.dc-km { display: flex; align-items: baseline; gap: 4px; margin: 8px 0 2px; }
-.dc-km .num { font-family: var(--serif); font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -.01em; }
-.dc-km .unit { font-size: 14px; color: var(--ink-3); }
-.dc-route { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); margin-top: 6px; }
-.dc-note { margin: 12px 0 0; padding-top: 12px; border-top: 1px dashed var(--line); }
+.dist-card {
+  position: relative; overflow: hidden; margin-top: 16px; padding: 18px 18px 16px;
+  background: var(--card); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, .96); border-radius: 24px; box-shadow: var(--shadow);
+}
+.dist-card::after {
+  content: ''; position: absolute; right: -50px; top: -60px; width: 170px; height: 170px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(255, 122, 31, .12), transparent 68%);
+  pointer-events: none;
+}
+.dc-head { display: flex; align-items: center; gap: 8px; position: relative; }
+.dc-tag { font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 9px; background: var(--grad); color: #fff; box-shadow: 0 4px 10px rgba(255, 90, 0, .22); }
+.dc-tag.long { background: linear-gradient(135deg, #9A8CF7, #6B4FD8); box-shadow: 0 4px 10px rgba(107, 79, 216, .22); }
+.dc-km { display: flex; align-items: baseline; gap: 5px; margin: 12px 0 2px; position: relative; }
+.dc-km .num { font-size: 42px; font-weight: 800; line-height: 1; letter-spacing: -.5px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dc-km .unit { font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.dc-route { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); margin-top: 8px; font-weight: 500; }
+.dc-route svg { color: var(--brand); }
+.dc-note { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); }
 
 .warn-block { margin-top: 12px; }
 
-.veh-visual { display: flex; gap: 14px; padding: 14px 0 4px; border-top: 1px dashed var(--line); margin-top: 8px; }
-.veh-icon { width: 64px; height: 64px; border-radius: 14px; background: var(--brand-tint); color: var(--brand); display: grid; place-items: center; flex: none; }
-.veh-points { display: grid; gap: 5px; align-content: center; }
-.vp { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
-.vp svg { color: var(--brand); flex: none; }
+.veh-visual { display: flex; gap: 14px; padding: 14px 0 4px; border-top: 1px solid var(--line); margin-top: 10px; }
+.veh-icon {
+  width: 66px; height: 66px; border-radius: 20px; flex: none;
+  background: var(--grad); color: #fff; display: grid; place-items: center;
+  box-shadow: 0 10px 20px rgba(255, 90, 0, .24), inset 0 1px 1px rgba(255, 255, 255, .45);
+}
+.veh-points { display: grid; gap: 6px; align-content: center; }
+.vp { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); line-height: 1.45; }
+.vp svg { color: var(--green); flex: none; }
 
-.assist-card { display: flex; gap: 12px; align-items: flex-start; }
-.ac-icon { width: 34px; height: 34px; border-radius: 9px; background: #F1EEE7; color: var(--ink-2); display: grid; place-items: center; flex: none; }
+.assist-card { display: flex; gap: 12px; align-items: center; }
+.ac-icon { width: 38px; height: 38px; border-radius: 12px; background: var(--amber-tint); color: var(--amber); display: grid; place-items: center; flex: none; }
 
-.ticket-card .tc-title { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; }
+.ticket-card .tc-title { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; }
 .ticket-card .tc-title svg { color: var(--brand); }
-.tc-list { margin: 8px 0 0; padding-left: 22px; font-size: 13px; color: var(--ink-2); line-height: 1.75; }
+.tc-list { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: var(--ink-2); line-height: 1.8; }
+.tc-list li::marker { color: var(--brand); }
 
-.fee-card { }
-.fee-row { display: flex; justify-content: space-between; font-size: 14px; padding: 7px 0; }
-.fee-val { font-weight: 600; color: var(--brand-deep); }
+.fee-row { display: flex; justify-content: space-between; font-size: 14px; padding: 8px 0; }
+.fee-val { font-weight: 700; color: var(--green-deep); }
 </style>

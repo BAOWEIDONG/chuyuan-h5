@@ -85,7 +85,7 @@ function setFiles(key, files) { draft.materials[key] = files }
     </div>
 
     <div class="action-bar">
-      <button class="btn btn-primary" :disabled="!valid" @click="router.push('/book/confirm')">
+      <button class="btn" :class="valid ? 'btn-primary' : 'btn-wait'" @click="router.push('/book/confirm')">
         <template v-if="valid">下一步：核对信息</template>
         <template v-else>还缺 {{ missing.join('、') }}</template>
       </button>
@@ -94,11 +94,12 @@ function setFiles(key, files) { draft.materials[key] = files }
 </template>
 
 <style scoped>
-.doctor-card { border-color: #E4D3B4; background: #FEFBF3; }
-.checklist { padding: 12px 16px; }
-.ck { display: flex; align-items: center; gap: 8px; font-size: 13.5px; padding: 8px 0; color: var(--ink-3); }
-.ck svg { color: var(--line-strong); }
-.ck.ok { color: var(--ink); }
-.ck.ok svg { color: var(--brand); }
-.ck-s { margin-left: auto; font-size: 12px; color: var(--ink-3); }
+.doctor-card { background: rgba(255, 249, 240, .92); border-color: rgba(255, 196, 130, .8); }
+.checklist { padding: 6px 16px; }
+.ck { display: flex; align-items: center; gap: 9px; font-size: 13.5px; padding: 11px 0; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.ck:last-child { border-bottom: 0; }
+.ck svg { color: rgba(60, 60, 67, .22); }
+.ck.ok { color: var(--ink); font-weight: 500; }
+.ck.ok svg { color: var(--green); }
+.ck-s { margin-left: auto; font-size: 12px; color: var(--ink-3); font-weight: 400; }
 </style>

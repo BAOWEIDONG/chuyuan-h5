@@ -75,14 +75,11 @@ const needsLabel = computed(() => (draft.needs.length ? draft.needs.map(n => (n 
         </div>
       </div>
 
-      <!-- 行程摘要：回单式排版 -->
+      <!-- 行程摘要 -->
       <section class="receipt">
         <div class="rc-head">
-          <div>
-            <div class="rc-title">出院交通安排</div>
-            <div class="rc-sub">受理后由服务方协调属地运力</div>
-          </div>
-          <div class="rc-stamp">待提交</div>
+          <div class="rc-title">行程确认</div>
+          <span class="badge active">待提交</span>
         </div>
 
         <div class="rc-route">
@@ -106,12 +103,12 @@ const needsLabel = computed(() => (draft.needs.length ? draft.needs.map(n => (n 
         </div>
 
         <div class="rc-grid">
-          <div class="rc-item"><span class="k">出行时间</span><span class="v">{{ draft.travelDate }} {{ draft.travelTime }}</span></div>
+          <div class="rc-item"><span class="k">出行时间</span><span class="v num">{{ draft.travelDate }} {{ draft.travelTime }}</span></div>
           <div class="rc-item"><span class="k">同行人数</span><span class="v">{{ draft.passengerCount }} 人</span></div>
           <div class="rc-item"><span class="k">车型</span><span class="v">{{ vehicleName }}</span></div>
-          <div class="rc-item"><span class="k">测算里程</span><span class="v">{{ draft.distanceKm }} 公里 · {{ draft.tripType === 'long' ? '长途' : '短途' }}</span></div>
+          <div class="rc-item"><span class="k">测算里程</span><span class="v num">{{ draft.distanceKm }} 公里 · {{ draft.tripType === 'long' ? '长途' : '短途' }}</span></div>
           <div class="rc-item"><span class="k">特殊需求</span><span class="v">{{ needsLabel }}</span></div>
-          <div class="rc-item"><span class="k">联系人</span><span class="v">{{ draft.contactName }} {{ draft.contactPhone }}</span></div>
+          <div class="rc-item"><span class="k">联系电话</span><span class="v num">{{ draft.contactPhone }}</span></div>
         </div>
 
         <div class="rc-materials">
@@ -138,7 +135,7 @@ const needsLabel = computed(() => (draft.needs.length ? draft.needs.map(n => (n 
     </div>
 
     <div class="action-bar">
-      <button class="btn btn-primary" :disabled="!canSubmit" @click="submit">
+      <button class="btn" :class="canSubmit ? 'btn-primary' : 'btn-wait'" @click="submit">
         {{ submitting ? '正在提交…' : (problems.length ? '请先修正信息' : (!agreed ? '请阅读并同意服务规则' : '提交申请')) }}
       </button>
     </div>
@@ -164,35 +161,37 @@ const needsLabel = computed(() => (draft.needs.length ? draft.needs.map(n => (n 
 </template>
 
 <style scoped>
-.receipt { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 16px; position: relative; overflow: hidden; }
-.receipt::before {
-  content: ''; position: absolute; inset: 6px; border: 1px dashed #E8E1D3; border-radius: 9px; pointer-events: none;
+.receipt {
+  position: relative; margin-top: 16px; padding: 18px;
+  background: var(--card); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, .96); border-radius: 24px; box-shadow: var(--shadow);
 }
-.rc-head { display: flex; justify-content: space-between; align-items: flex-start; position: relative; }
-.rc-title { font-family: var(--serif); font-size: 19px; font-weight: 700; }
-.rc-sub { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
-.rc-stamp { font-size: 11px; color: var(--seal); border: 1px solid rgba(179,58,43,.5); border-radius: 5px; padding: 3px 8px; transform: rotate(-4deg); letter-spacing: .06em; }
-.rc-route { margin: 18px 0 4px; position: relative; }
-.rc-point { display: flex; gap: 10px; align-items: flex-start; }
-.rc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); margin-top: 5px; flex: none; }
-.rc-dot.hollow { background: transparent; border: 1.5px solid var(--ink-3); }
-.rc-link { width: 1px; height: 22px; background: repeating-linear-gradient(to bottom, var(--line-strong) 0 3px, transparent 3px 6px); margin-left: 3.5px; }
-.rc-label { font-size: 10.5px; color: var(--ink-3); letter-spacing: .06em; }
-.rc-name { font-size: 14.5px; font-weight: 500; line-height: 1.35; margin-top: 1px; }
-.rc-addr { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
-.rc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
-.rc-item { display: flex; flex-direction: column; gap: 2px; }
-.rc-item .k { font-size: 11px; color: var(--ink-3); }
-.rc-item .v { font-size: 13.5px; line-height: 1.4; }
-.rc-materials { display: flex; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 12px; }
+.rc-head { display: flex; justify-content: space-between; align-items: center; }
+.rc-title { font-size: 17px; font-weight: 800; letter-spacing: .2px; }
+.rc-route { margin: 18px 0 4px; }
+.rc-point { display: flex; gap: 11px; align-items: flex-start; }
+.rc-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--grad); margin-top: 5px; flex: none; box-shadow: 0 0 0 3px var(--brand-tint); }
+.rc-dot.hollow { background: #fff; border: 1.5px solid rgba(60, 60, 67, .28); box-shadow: 0 0 0 3px var(--fill); }
+.rc-link { width: 1px; height: 22px; background: repeating-linear-gradient(to bottom, rgba(60,60,67,.22) 0 3px, transparent 3px 6px); margin-left: 4px; }
+.rc-label { font-size: 11px; color: var(--ink-3); }
+.rc-name { font-size: 15.5px; font-weight: 600; line-height: 1.35; margin-top: 1px; }
+.rc-addr { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+.rc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.rc-item { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rc-item .k { font-size: 11.5px; color: var(--ink-3); }
+.rc-item .v { font-size: 14px; font-weight: 500; line-height: 1.4; }
+.rc-materials { display: flex; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; }
 .rc-materials .k { color: var(--ink-3); flex: none; }
-.rc-materials .m { color: var(--ink-2); line-height: 1.5; }
+.rc-materials .m { color: var(--ink-2); line-height: 1.55; }
 .warn-list { margin-top: 14px; }
-.agree { display: flex; gap: 9px; align-items: flex-start; margin-top: 20px; padding: 0 2px; }
-.agree .box { width: 19px; height: 19px; border-radius: 5px; border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: #fff; flex: none; margin-top: 1px; }
-.agree .box.on { background: var(--brand); border-color: var(--brand); }
-.link { color: var(--brand-deep); text-decoration: underline; text-underline-offset: 2px; font-size: inherit; display: inline; }
-.rule { margin-bottom: 14px; }
-.rule b { font-size: 13.5px; font-weight: 600; }
-.rule p { font-size: 13px; color: var(--ink-2); line-height: 1.65; margin: 4px 0 0; }
+.agree {
+  display: flex; gap: 9px; align-items: flex-start; margin-top: 18px; padding: 14px 15px;
+  border-radius: 16px; background: rgba(255, 255, 255, .7); border: 1px solid rgba(255, 255, 255, .95);
+}
+.agree .box { width: 20px; height: 20px; border-radius: 7px; border: 1.5px solid rgba(60,60,67,.24); display: grid; place-items: center; color: #fff; flex: none; margin-top: 1px; transition: all .15s; }
+.agree .box.on { background: var(--grad); border-color: transparent; box-shadow: 0 3px 8px rgba(255, 90, 0, .26); }
+.link { color: var(--brand-ink); text-decoration: underline; text-underline-offset: 2px; font-size: inherit; display: inline; font-weight: 600; }
+.rule { margin-bottom: 16px; }
+.rule b { font-size: 14px; font-weight: 700; }
+.rule p { font-size: 13px; color: var(--ink-2); line-height: 1.7; margin: 4px 0 0; }
 </style>

@@ -109,7 +109,7 @@ function quickCity(c) {
             </label>
             <div v-if="!hospitalList.length" class="empty">
               <div class="t">该城市暂未收录医院</div>
-              <div class="small">可返回选择其他城市，或拨打 95511-7 咨询</div>
+              <div class="small">可返回选择其他城市，或拨打 400-820-8866 咨询</div>
             </div>
             <button v-for="h in hospitalList" :key="h.id" class="opt"
                     :class="{ disabled: !!h.err }" :disabled="!!h.err" @click="choose(h)">

@@ -27,9 +27,9 @@ function set(v) {
 
 <style scoped>
 .stepper-wrap { display: flex; flex-direction: column; align-items: flex-end; }
-.stepper { display: flex; align-items: center; gap: 4px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 3px; }
-.sb { width: 34px; height: 32px; display: grid; place-items: center; border-radius: 7px; color: var(--ink-2); }
-.sb:disabled { opacity: .3; }
+.stepper { display: flex; align-items: center; gap: 2px; border: 1px solid var(--hairline); border-radius: 14px; padding: 3px; background: rgba(255, 255, 255, .8); }
+.sb { width: 34px; height: 32px; display: grid; place-items: center; border-radius: 11px; color: var(--brand-ink); }
+.sb:disabled { opacity: .28; }
 .sb:active:not(:disabled) { background: var(--brand-tint); }
-.val { min-width: 62px; text-align: center; font-size: 15px; font-weight: 600; }
+.val { min-width: 58px; text-align: center; font-size: 15px; font-weight: 700; }
 </style>

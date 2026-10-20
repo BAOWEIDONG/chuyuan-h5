@@ -1,29 +1,56 @@
 :root {
-  /* 纸与墨：回单、病历、出院小结的纸质感，不用纯白 */
-  --paper: #F7F5F0;
-  --card: #FFFDF9;
-  --ink: #1B2A33;
-  --ink-2: #45565F;
-  --ink-3: #7C8A91;
-  --line: #E3DED4;
-  --line-strong: #CFC7B8;
+  /* 浅色玻璃 + 小面积渐变：底色近白，玻璃卡浮在光晕上 */
+  --bg: #F5F6FA;
+  --bg-top: #FCFCFE;
+  --card: rgba(255, 255, 255, 0.88);
+  --card-solid: #FFFFFF;
+  --fill: rgba(120, 120, 128, 0.08);
+  --fill-2: rgba(120, 120, 128, 0.12);
 
-  /* 主色：救护车与出院章的深松绿，用于确认、主按钮 */
-  --brand: #146356;
-  --brand-deep: #0E4A40;
-  --brand-tint: #E6EFEC;
+  --ink: #1C1C1E;
+  --ink-2: rgba(60, 60, 67, 0.72);
+  --ink-3: rgba(60, 60, 67, 0.44);
+  --line: rgba(60, 60, 67, 0.09);
+  --hairline: rgba(60, 60, 67, 0.14);
 
-  /* 强调：印章朱红，只用于状态与关键提示 */
-  --seal: #B33A2B;
-  --seal-tint: #F7E7E3;
+  /* 主色：橙色渐变只用于按钮、图标块、选中态这类小面积 */
+  --brand: #F26A00;
+  --brand-2: #FF8A1F;
+  --brand-deep: #C45200;
+  --brand-ink: #A85000;
+  --brand-tint: #FFF3E8;
+  --brand-line: rgba(255, 102, 0, 0.34);
 
-  --amber: #A9741C;
-  --amber-tint: #F8EFDD;
+  --grad: linear-gradient(135deg, #FFA149 0%, #FF6600 50%, #FF4A00 100%);
+  --grad-soft: linear-gradient(135deg, #FFB877 0%, #FF7A1F 100%);
+  --grad-sky: linear-gradient(135deg, #6FB7FF 0%, #3E8EF7 100%);
 
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow: 0 1px 0 rgba(27, 42, 51, 0.04), 0 8px 24px -18px rgba(27, 42, 51, 0.35);
+  /* 语义色 */
+  --green: #0FA35B;
+  --green-tint: rgba(15, 163, 91, 0.1);
+  --green-deep: #0B8A4E;
+  --red: #E2432E;
+  --red-tint: rgba(226, 67, 46, 0.09);
+  --amber: #C77800;
+  --amber-tint: rgba(255, 149, 0, 0.11);
+  --violet: #6B4FD8;
+  --violet-tint: rgba(107, 79, 216, 0.1);
 
-  --serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;
-  --sans: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --radius: 20px;
+  --radius-sm: 14px;
+  --radius-xs: 10px;
+  --shadow: 0 10px 30px rgba(31, 38, 135, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 4px 14px rgba(31, 38, 135, 0.05);
+  --shadow-brand: 0 10px 22px rgba(255, 90, 0, 0.26);
+  --blur: blur(26px) saturate(1.75);
+
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+
+  /* 兼容旧变量名：统一映射到新系统，避免遗留页面对不上 */
+  --paper: transparent;
+  --serif: var(--sans);
+  --seal: var(--red);
+  --seal-tint: var(--red-tint);
+  --line-strong: var(--hairline);
+  --radius-lg: 24px;
 }

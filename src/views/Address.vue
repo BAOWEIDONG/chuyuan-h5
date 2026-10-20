@@ -43,10 +43,15 @@ function save(a) {
         </div>
       </div>
 
-      <div v-else class="empty" style="padding-top:40px">
-        <div class="t">尚未登记家庭常住地</div>
-        <div class="small">首次预约时需要登记，登记后不可修改</div>
-        <button class="btn btn-primary btn-sm" style="margin-top:18px;display:inline-flex" @click="open = true">登记地址</button>
+      <div v-else class="card empty-card">
+        <span class="ec-ic"><Icon name="pin" :size="24" /></span>
+        <div class="ec-t">尚未登记家庭常住地</div>
+        <div class="ec-d">首次预约时需要登记家庭常住地，登记后不可修改。后续申请将默认使用该地址。</div>
+        <ul class="ec-pts">
+          <li><Icon name="check" :size="13" /> 支持按省市区逐级选择</li>
+          <li><Icon name="check" :size="13" /> 需上传一份住址证明材料</li>
+        </ul>
+        <button class="btn btn-primary" style="margin-top:16px" @click="open = true">登记地址</button>
       </div>
 
       <div class="section-title"><span class="t">哪些地址不能作为家庭常住地</span></div>
@@ -66,15 +71,33 @@ function save(a) {
 </template>
 
 <style scoped>
-.addr-card { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 16px; position: relative; }
+.addr-card {
+  position: relative; margin-top: 16px; padding: 18px;
+  background: var(--card); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, .96); border-radius: 24px; box-shadow: var(--shadow);
+}
 .ac-top { display: flex; justify-content: space-between; align-items: center; }
-.ac-badge { font-size: 11px; color: var(--brand-deep); background: var(--brand-tint); padding: 2px 8px; border-radius: 5px; font-weight: 600; }
-.ac-addr { font-family: var(--serif); font-size: 19px; font-weight: 700; margin-top: 14px; line-height: 1.4; }
-.ac-detail { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
-.ac-proof { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
-.ac-lock { display: flex; gap: 6px; font-size: 11.5px; color: var(--ink-3); margin-top: 10px; line-height: 1.55; background: #F4F1EA; padding: 10px 12px; border-radius: 8px; }
-.ac-lock svg { flex: none; margin-top: 1px; }
-.no-list { padding: 10px 16px; }
-.nl { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); padding: 7px 0; }
-.nl svg { color: var(--seal); flex: none; }
+.ac-badge { font-size: 11.5px; color: #fff; background: var(--grad); padding: 3px 10px; border-radius: 9px; font-weight: 700; }
+.ac-addr { font-size: 20px; font-weight: 800; margin-top: 14px; line-height: 1.4; letter-spacing: .1px; }
+.ac-detail { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+.ac-proof { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); margin-top: 15px; padding-top: 13px; border-top: 1px solid var(--line); }
+.ac-lock {
+  display: flex; gap: 7px; font-size: 11.5px; color: var(--ink-2); margin-top: 12px; line-height: 1.6;
+  background: var(--fill); padding: 11px 12px; border-radius: 12px;
+}
+.ac-lock svg { flex: none; margin-top: 1px; color: var(--ink-3); }
+.empty-card { margin-top: 16px; padding: 22px 18px 18px; text-align: center; }
+.ec-ic {
+  width: 56px; height: 56px; border-radius: 18px; margin: 0 auto 14px; display: grid; place-items: center;
+  background: var(--brand-tint); color: var(--brand); border: 1px solid var(--brand-line);
+}
+.ec-t { font-size: 17px; font-weight: 800; }
+.ec-d { font-size: 12.5px; color: var(--ink-3); line-height: 1.6; margin-top: 7px; }
+.ec-pts { list-style: none; margin: 16px 0 0; padding: 14px 14px; text-align: left; background: var(--fill); border-radius: 14px; display: flex; flex-direction: column; gap: 8px; }
+.ec-pts li { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-2); }
+.ec-pts svg { color: var(--green); flex: none; }
+.no-list { padding: 4px 16px; }
+.nl { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink-2); padding: 10px 0; border-bottom: 1px solid var(--line); }
+.nl:last-child { border-bottom: 0; }
+.nl svg { color: var(--red); flex: none; }
 </style>

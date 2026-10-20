@@ -70,6 +70,7 @@ function reset() {
 
 const shortcuts = [
   { label: '客户 App 入口', path: '/demo/entry' },
+  { label: '入口 · 等待期保单', path: '/demo/entry?persona=waiting' },
   { label: '服务首页', path: '/' },
   { label: '资格校验', path: '/eligibility' },
   { label: '预约表单', path: '/book' },
@@ -81,7 +82,7 @@ const shortcuts = [
 
 <template>
   <div class="demo">
-    <NavBar title="演示控制台" back="/demo/entry">
+    <NavBar title="平台操作台" back="/demo/entry">
       <template #right>
         <button class="reset" @click="reset">清空数据</button>
       </template>
@@ -162,37 +163,48 @@ const shortcuts = [
 </template>
 
 <style scoped>
-.demo { min-height: 100vh; background: var(--paper); }
-.wrap { padding: 14px 18px 40px; }
-.note { font-size: 12.5px; line-height: 1.6; color: var(--ink-3); margin: 0 0 14px; }
-.reset { font-size: 12.5px; color: var(--seal); }
+.demo { min-height: 100vh; }
+.wrap { padding: 12px 16px 40px; }
+.note { font-size: 12.5px; line-height: 1.65; color: var(--ink-3); margin: 0 0 14px; }
+.reset { font-size: 12.5px; color: var(--red); font-weight: 600; }
 
-.tabs { display: flex; gap: 6px; background: #ECE8DF; padding: 3px; border-radius: 9px; margin-bottom: 14px; }
-.tab { flex: 1; height: 32px; border-radius: 7px; font-size: 12.5px; color: var(--ink-3); }
-.tab.on { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(27,42,51,.08); }
+.tabs { display: flex; gap: 4px; background: var(--fill); padding: 4px; border-radius: 14px; margin-bottom: 14px; }
+.tab { flex: 1; height: 34px; border-radius: 11px; font-size: 12.5px; color: var(--ink-2); font-weight: 500; white-space: nowrap; }
+.tab.on { background: #fff; color: var(--ink); font-weight: 700; box-shadow: 0 2px 8px rgba(31, 38, 135, .08); }
 
-.list { display: flex; flex-direction: column; gap: 10px; }
-.sc { display: flex; align-items: center; gap: 10px; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; }
-.sc-main { flex: 1; }
-.sc-n { font-size: 14.5px; font-weight: 600; }
-.sc-d { font-size: 12px; color: var(--ink-3); margin-top: 2px; line-height: 1.45; }
+.list { display: flex; flex-direction: column; gap: 9px; }
+.sc {
+  display: flex; align-items: center; gap: 10px; text-align: left; padding: 14px 15px;
+  background: var(--card); border: 1px solid rgba(255, 255, 255, .95); border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.sc-main { flex: 1; min-width: 0; }
+.sc-n { font-size: 15px; font-weight: 700; }
+.sc-d { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
 
-.oc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.oc { background: var(--card); border: 1px solid rgba(255, 255, 255, .95); border-radius: 18px; padding: 14px 15px; box-shadow: var(--shadow-sm); }
 .oc-head { display: flex; align-items: center; gap: 8px; }
-.oc-body { padding: 9px 0 2px; }
-.oc-h { font-size: 14px; font-weight: 500; }
-.oc-m { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
+.oc-body { padding: 10px 0 2px; }
+.oc-h { font-size: 14.5px; font-weight: 600; }
+.oc-m { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.55; }
 .oc-t { margin-top: 4px; }
-.oc-acts { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.oc-acts { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .act-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.act { height: 38px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line-strong); font-size: 13px; color: var(--ink-2); background: var(--card); }
-.act.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; width: 100%; }
-.act.sm { height: 32px; padding: 0 11px; font-size: 12.5px; border-radius: 8px; }
-.act.danger { color: var(--seal); border-color: #E3C3BC; }
+.act {
+  height: 38px; padding: 0 15px; border-radius: 19px; border: 1px solid var(--hairline);
+  font-size: 13px; color: var(--ink-2); background: rgba(255, 255, 255, .9); font-weight: 500;
+}
+.act.primary {
+  background: var(--grad); border-color: transparent; color: #fff; font-weight: 700; width: 100%;
+  box-shadow: 0 8px 16px rgba(255, 90, 0, .22);
+}
+.act.sm { height: 33px; padding: 0 12px; font-size: 12.5px; border-radius: 17px; }
+.act.danger { color: var(--red); border-color: rgba(226, 67, 46, .32); }
 
 .toast {
-  position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%);
-  background: rgba(27,42,51,.92); color: #fff; font-size: 13px;
-  padding: 9px 16px; border-radius: 999px; z-index: 70; white-space: nowrap;
+  position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%);
+  background: rgba(28, 28, 30, .92); color: #fff; font-size: 13px;
+  padding: 10px 18px; border-radius: 20px; z-index: 70; white-space: nowrap;
+  backdrop-filter: blur(10px); box-shadow: 0 10px 26px rgba(0, 0, 0, .2);
 }
 </style>

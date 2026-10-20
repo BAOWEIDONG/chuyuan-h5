@@ -62,7 +62,7 @@ function back() {
           <div class="h2">本次住院已申请过服务</div>
           <p class="small muted" style="margin-top:8px">保单有效期内，同一次住院仅提供 1 次出院交通安排服务。你可以在服务记录中查看当前订单进度。</p>
           <button class="btn btn-primary" style="margin-top:16px" @click="router.push('/order/' + activeOrder.id)">查看当前进度</button>
-          <button class="reapply" @click="bypass = true">演示用：以另一次住院重新申请</button>
+          <button class="reapply" @click="bypass = true">以另一次住院重新申请</button>
         </div>
       </template>
 
@@ -77,7 +77,7 @@ function back() {
         <div class="card" style="margin-top:20px">
           <div class="h3">你可以这样做</div>
           <div class="opt" style="padding-top:12px">
-            <span class="main"><span class="l">拨打 95511-7 咨询</span><span class="d">确认是否有其他可用的服务权益</span></span>
+            <span class="main"><span class="l">拨打 400-820-8866 咨询</span><span class="d">确认是否有其他可用的服务权益</span></span>
             <Icon class="chev" name="chevron" :size="17" />
           </div>
           <div class="opt">
@@ -120,21 +120,29 @@ function back() {
 </template>
 
 <style scoped>
-.q-head { padding: 26px 2px 6px; }
-.q-step { letter-spacing: .04em; }
-.q-list { margin-top: 18px; display: grid; gap: 10px; }
+.q-head { padding: 22px 2px 4px; }
+.q-step {
+  display: inline-block; padding: 4px 10px; border-radius: 8px;
+  background: var(--brand-tint); color: var(--brand-ink); font-weight: 600;
+}
+.q-list { margin-top: 20px; display: grid; gap: 10px; }
 .q-opt {
   display: flex; align-items: center; gap: 12px; text-align: left;
-  padding: 17px 16px; border-radius: 12px; border: 1px solid var(--line);
-  background: var(--card); font-size: 15px; line-height: 1.4;
-  transition: border-color .15s, background .15s;
+  padding: 17px 16px; border-radius: 18px;
+  background: var(--card); border: 1px solid rgba(255, 255, 255, .95);
+  box-shadow: var(--shadow-sm); font-size: 15.5px; font-weight: 500; line-height: 1.4;
+  transition: border-color .15s, background .15s, transform .12s;
 }
-.q-opt.on { border-color: var(--brand); background: var(--brand-tint); }
+.q-opt:active { transform: scale(.988); }
+.q-opt.on { border-color: var(--brand-line); background: rgba(255, 247, 240, .96); box-shadow: 0 6px 18px rgba(255, 102, 0, .1); }
 .q-label { flex: 1; }
-.q-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; flex: none; color: #fff; }
-.q-opt.on .q-radio { background: var(--brand); border-color: var(--brand); }
-.q-back { display: inline-flex; align-items: center; gap: 4px; margin-top: 18px; padding: 6px 0; }
+.q-radio {
+  width: 23px; height: 23px; border-radius: 50%; border: 1.5px solid rgba(60, 60, 67, .22);
+  display: grid; place-items: center; flex: none; color: #fff; transition: all .15s;
+}
+.q-opt.on .q-radio { background: var(--grad); border-color: transparent; box-shadow: 0 3px 8px rgba(255, 90, 0, .26); }
+.q-back { display: inline-flex; align-items: center; gap: 4px; margin-top: 18px; padding: 6px 0; font-size: 13px; color: var(--ink-3); }
 .reapply { display: block; width: 100%; margin-top: 12px; font-size: 12px; color: var(--ink-3); text-align: center; padding: 6px; }
 .block { text-align: center; display: flex; flex-direction: column; align-items: center; }
-.block-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--seal-tint); color: var(--seal); display: grid; place-items: center; }
+.block-icon { width: 60px; height: 60px; border-radius: 50%; background: var(--red-tint); color: var(--red); display: grid; place-items: center; }
 </style>

@@ -60,14 +60,16 @@ function confirm() {
 </template>
 
 <style scoped>
-.date-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.date-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .date-cell {
-  border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px 6px;
-  display: grid; gap: 2px; justify-items: center; background: var(--card);
+  border: 1.5px solid transparent; border-radius: 16px; padding: 12px 6px;
+  display: grid; gap: 3px; justify-items: center; background: var(--fill);
+  transition: all .15s ease;
 }
-.date-cell .w { font-size: 12px; color: var(--ink-3); }
-.date-cell .d { font-size: 22px; font-weight: 700; line-height: 1.1; }
-.date-cell .s { font-size: 11px; color: var(--ink-3); }
-.date-cell.on { border-color: var(--brand); background: var(--brand-tint); box-shadow: inset 0 0 0 1px var(--brand); }
-.date-cell.on .d { color: var(--brand-deep); }
+.date-cell .w { font-size: 11.5px; color: var(--ink-3); }
+.date-cell .d { font-size: 21px; font-weight: 800; line-height: 1.1; letter-spacing: -.2px; }
+.date-cell .s { font-size: 10.5px; color: var(--ink-3); }
+.date-cell.on { border-color: var(--brand-line); background: rgba(255, 246, 238, .96); box-shadow: 0 6px 16px rgba(255, 102, 0, .1); }
+.date-cell.on .d { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.date-cell.on .w, .date-cell.on .s { color: var(--brand-ink); }
 </style>

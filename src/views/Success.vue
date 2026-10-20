@@ -14,7 +14,7 @@ const deadline = computed(() => order.value ? formatDateTime(order.value.sla.res
 <template>
   <div class="success" v-if="order">
     <div class="s-top">
-      <div class="s-check"><Icon name="check" :size="26" /></div>
+      <div class="s-check"><Icon name="check" :size="30" /></div>
       <h1 class="s-title">申请已提交</h1>
       <p class="s-sub">服务方将核验材料并与你确认行程</p>
     </div>
@@ -54,24 +54,42 @@ const deadline = computed(() => order.value ? formatDateTime(order.value.sla.res
       <button class="btn btn-ghost" @click="router.replace('/')">返回首页</button>
     </div>
   </div>
+  <div v-else class="empty" style="padding-top:120px">
+    <div class="t">没有找到这笔申请</div>
+    <div class="small">可能已在其他设备提交，请到服务记录中查看</div>
+    <button class="btn btn-primary btn-sm" style="margin-top:18px;display:inline-flex" @click="router.replace('/orders')">查看服务记录</button>
+  </div>
 </template>
 
 <style scoped>
-.success { padding: 34px 18px calc(24px + env(safe-area-inset-bottom)); }
+.success { padding: 40px 16px calc(24px + env(safe-area-inset-bottom)); }
 .s-top { text-align: center; }
-.s-check { width: 62px; height: 62px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); display: grid; place-items: center; margin: 0 auto 16px; }
-.s-title { font-family: var(--serif); font-size: 25px; font-weight: 700; margin: 0; }
-.s-sub { font-size: 13px; color: var(--ink-3); margin: 6px 0 0; }
-.s-card { margin-top: 24px; padding: 6px 16px; }
-.s-row { display: flex; justify-content: space-between; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.s-check {
+  width: 74px; height: 74px; border-radius: 26px; margin: 0 auto 18px;
+  background: var(--grad); color: #fff; display: grid; place-items: center;
+  box-shadow: 0 18px 34px rgba(255, 90, 0, .3), inset 0 1.5px 1px rgba(255, 255, 255, .5);
+}
+.s-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: .5px; }
+.s-sub { font-size: 13.5px; color: var(--ink-3); margin: 8px 0 0; }
+.s-card { margin-top: 26px; padding: 4px 16px; border-radius: 20px; }
+.s-row { display: flex; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.s-row:last-child { border-bottom: 0; }
 .s-row .k { color: var(--ink-3); flex: none; }
-.s-row .v { text-align: right; }
-.steps { margin-top: 22px; display: grid; gap: 14px; padding: 0 2px; }
+.s-row .v { text-align: right; font-weight: 500; }
+.steps { margin-top: 22px; display: grid; gap: 14px; padding: 4px 2px; }
 .st { display: flex; gap: 12px; }
-.st .n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; font-size: 11.5px; color: var(--ink-3); flex: none; margin-top: 1px; }
-.st b { font-size: 13.5px; font-weight: 600; }
-.st p { font-size: 12.5px; color: var(--ink-3); margin: 3px 0 0; line-height: 1.55; }
-.s-note { display: flex; gap: 8px; margin-top: 24px; padding: 12px; border-radius: 10px; background: #F1EEE7; font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.st .n {
+  width: 24px; height: 24px; border-radius: 9px; flex: none; margin-top: 1px;
+  background: var(--brand-tint); color: var(--brand-ink);
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
+}
+.st b { font-size: 14px; font-weight: 700; }
+.st p { font-size: 12.5px; color: var(--ink-3); margin: 4px 0 0; line-height: 1.6; }
+.s-note {
+  display: flex; gap: 8px; margin-top: 24px; padding: 13px 14px; border-radius: 16px;
+  background: rgba(255, 255, 255, .72); border: 1px solid rgba(255, 255, 255, .95);
+  font-size: 12px; color: var(--ink-2); line-height: 1.65;
+}
 .s-note svg { flex: none; margin-top: 1px; color: var(--ink-3); }
-.s-actions { display: grid; gap: 10px; margin-top: 24px; }
+.s-actions { display: grid; gap: 10px; margin-top: 26px; }
 </style>

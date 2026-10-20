@@ -46,15 +46,19 @@ function retry() {
         <button class="btn btn-ghost btn-sm" style="margin-top:20px" @click="retry">返回重新进入</button>
       </template>
     </div>
-    <p class="foot tiny">本服务由服务方提供，页面仅用于演示</p>
+    <p class="foot tiny">本服务由平台服务方提供</p>
   </div>
 </template>
 
 <style scoped>
-.auth { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
-.auth-box { display: flex; flex-direction: column; align-items: center; }
-.spin { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--brand-tint); border-top-color: var(--brand); animation: sp .8s linear infinite; }
+.auth { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.auth-box { display: flex; flex-direction: column; align-items: center; padding: 0 24px; }
+.spin {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid rgba(255, 122, 31, .18); border-top-color: var(--brand);
+  animation: sp .8s linear infinite;
+}
 @keyframes sp { to { transform: rotate(360deg) } }
-.err-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--seal-tint); color: var(--seal); display: grid; place-items: center; }
-.foot { position: absolute; bottom: 28px; color: var(--ink-3); }
+.err-icon { width: 58px; height: 58px; border-radius: 50%; background: var(--red-tint); color: var(--red); display: grid; place-items: center; }
+.foot { position: absolute; bottom: 30px; color: var(--ink-3); font-size: 11.5px; }
 </style>

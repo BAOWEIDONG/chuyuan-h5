@@ -14,8 +14,10 @@ const route = useRoute()
 const router = useRouter()
 const order = computed(() => store.getOrder(route.params.id))
 
-const newDate = ref(order.value?.travelDate || '')
-const newTime = ref(order.value?.travelTime || '')
+// 不预填原时间：预填会让"未改动"看起来像报错，也让用户少了主动选择的动作
+const newDate = ref('')
+const newTime = ref('')
+const touchedDate = ref(false)
 const reason = ref('')
 const submitted = ref(false)
 const dateOpen = ref(false)
@@ -54,7 +56,7 @@ const leadHours = computed(() => {
 
 const tooLate = computed(() => leadHours.value < 4)
 const unchanged = computed(() => order.value && newDate.value === order.value.travelDate && newTime.value === order.value.travelTime)
-const dateErr = computed(() => order.value ? checkTravelDate(order.value.dischargeDate, newDate.value) : null)
+const dateErr = computed(() => (order.value && newDate.value && touchedDate.value) ? checkTravelDate(order.value.dischargeDate, newDate.value) : null)
 const valid = computed(() => newDate.value && newTime.value && !dateErr.value && !unchanged.value && !tooLate.value && reason.value)
 
 const count = computed(() => order.value?.rescheduleCount || 0)
@@ -138,13 +140,13 @@ function submit() {
     </div>
 
     <div class="action-bar">
-      <button class="btn btn-primary" :disabled="!valid || overLimit" @click="submit">
+      <button class="btn" :class="valid && !overLimit ? 'btn-primary' : 'btn-wait'" @click="submit">
         {{ submitted ? '已提交' : (tooLate ? '已超过可变更时间' : (unchanged ? '时间未变化' : '确认变更')) }}
       </button>
     </div>
 
     <DatePicker v-model:open="dateOpen" title="选择新的出行日期" :dates="dates" :model-value="newDate"
-                disabled-hint="仅限出院当天及之后 2 个自然日内" @update:model-value="v => newDate = v" />
+                disabled-hint="仅限出院当天及之后 2 个自然日内" @update:model-value="v => { newDate = v; touchedDate = true }" />
     <TimePicker v-model:open="timeOpen" :model-value="newTime" @update:model-value="v => newTime = v" />
     <PickerSheet v-model:open="reasonOpen" title="变更原因" :options="REASONS" :model-value="reason"
                  :searchable="false" @update:model-value="v => reason = v" />
@@ -152,7 +154,7 @@ function submit() {
 </template>
 
 <style scoped>
-.summary { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: var(--brand-tint); }
-.sm-val { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--brand-deep); margin-top: 3px; }
-.sm-note { font-size: 12px; color: #3E6B62; margin-top: 4px; }
+.summary { margin-top: 16px; padding: 16px; border-radius: 18px; background: var(--brand-tint); border: 1px solid rgba(255, 196, 130, .55); }
+.sm-val { font-size: 21px; font-weight: 800; color: var(--brand-ink); margin-top: 4px; letter-spacing: .2px; }
+.sm-note { font-size: 12px; color: var(--brand-ink); opacity: .78; margin-top: 5px; line-height: 1.5; }
 </style>

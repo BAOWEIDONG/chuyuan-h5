@@ -1,0 +1,29 @@
+:root {
+  /* 纸与墨：回单、病历、出院小结的纸质感，不用纯白 */
+  --paper: #F7F5F0;
+  --card: #FFFDF9;
+  --ink: #1B2A33;
+  --ink-2: #45565F;
+  --ink-3: #7C8A91;
+  --line: #E3DED4;
+  --line-strong: #CFC7B8;
+
+  /* 主色：救护车与出院章的深松绿，用于确认、主按钮 */
+  --brand: #146356;
+  --brand-deep: #0E4A40;
+  --brand-tint: #E6EFEC;
+
+  /* 强调：印章朱红，只用于状态与关键提示 */
+  --seal: #B33A2B;
+  --seal-tint: #F7E7E3;
+
+  --amber: #A9741C;
+  --amber-tint: #F8EFDD;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 0 rgba(27, 42, 51, 0.04), 0 8px 24px -18px rgba(27, 42, 51, 0.35);
+
+  --serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;
+  --sans: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}

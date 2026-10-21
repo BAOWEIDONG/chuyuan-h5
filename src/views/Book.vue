@@ -14,7 +14,7 @@ import { store } from '../store/orders.js'
 import { session } from '../store/session.js'
 import { hospitalsOf, hospitalById } from '../data/hospitals.js'
 import { checkHospital, checkStay, checkTravelDate, checkPassengers, allowedTravelDates, tripTypeOf } from '../rules/eligibility.js'
-import { addDays, ymd, ymdCn, parseYmd, formatDateTime } from '../rules/time.js'
+import { addDays, ymd, ymdCn, parseYmd, startOfDay, diffDays, formatDateTime } from '../rules/time.js'
 
 const router = useRouter()
 
@@ -42,11 +42,24 @@ const admissionDates = computed(() => {
   return out
 })
 
+// 出院日期按"今天"往后排，而不是从入院日期加固定天数：
+// 住院时间可能很长（例如入院已 30 天），从入院日加 1~8 天会全部落在过去，弹层就空着。
+// 约束只有两条：晚于入院日期、最多提前 7 天预约（R05）。
 const dischargeDates = computed(() => {
-  const start = draft.admissionDate ? parseYmd(draft.admissionDate) : today
+  const a = draft.admissionDate ? parseYmd(draft.admissionDate) : null
   const out = []
-  for (let i = 1; i <= 8; i++) out.push(addDays(start, i))
-  return out.filter(d => d >= today || ymd(d) === ymd(today))
+  for (let i = 0; i <= 7; i++) {
+    const d = addDays(today, i)
+    if (a && diffDays(a, d) < 1) continue // 当日出入院不支持，需至少隔 1 天
+    out.push(d)
+  }
+  return out
+})
+
+const dischargeHint = computed(() => {
+  if (!draft.admissionDate) return '请先选择入院日期'
+  if (!dischargeDates.value.length) return '入院日期为今天，出院日期最早为明天'
+  return `需晚于入院日期（${draft.admissionDate}），且最多提前 7 天预约`
 })
 
 const travelDates = computed(() => {
@@ -302,7 +315,7 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
     <DatePicker v-model:open="admissionOpen" title="选择入院日期" :dates="admissionDates" :model-value="draft.admissionDate"
                 disabled-hint="仅可选择最近 30 天内的入院日期" @update:model-value="pickAdmission" />
     <DatePicker v-model:open="dischargeOpen" title="选择出院日期" :dates="dischargeDates" :model-value="draft.dischargeDate"
-                disabled-hint="出院日期需晚于入院日期" @update:model-value="pickDischarge" />
+                :disabled-hint="dischargeHint" @update:model-value="pickDischarge" />
     <DatePicker v-model:open="travelOpen" title="选择出行日期" :dates="travelDates" :model-value="draft.travelDate"
                 disabled-hint="仅限出院当天及之后 2 个自然日内" @update:model-value="pickTravel" />
     <TimePicker v-model:open="timeOpen" :model-value="draft.travelTime" @update:model-value="v => (draft.travelTime = v, validate())" />

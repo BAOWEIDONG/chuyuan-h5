@@ -41,7 +41,11 @@ function confirm() {
           </div>
           <div class="sheet-body">
             <p v-if="disabledHint" class="small muted" style="margin-top:0">{{ disabledHint }}</p>
-            <div class="date-grid">
+            <div v-if="!items.length" class="no-date">
+              <Icon name="calendar" :size="22" />
+              <span>{{ disabledHint || '暂无可选日期' }}</span>
+            </div>
+            <div v-else class="date-grid">
               <button v-for="it in items" :key="it.value" class="date-cell"
                       :class="{ on: picked === it.value }" @click="picked = it.value">
                 <span class="w">{{ it.week }}</span>
@@ -60,6 +64,12 @@ function confirm() {
 </template>
 
 <style scoped>
+.no-date {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 34px 16px; color: var(--ink-3); font-size: 13px; text-align: center; line-height: 1.6;
+  background: var(--fill); border-radius: 16px;
+}
+.no-date svg { opacity: .5; }
 .date-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .date-cell {
   border: 1.5px solid transparent; border-radius: 16px; padding: 12px 6px;

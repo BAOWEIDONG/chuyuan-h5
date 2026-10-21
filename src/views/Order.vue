@@ -80,12 +80,20 @@ const timeline = computed(() => {
   if (!o) return []
   const done = o.timeline || []
   const doneCodes = done.map(t => t.code)
+  // 与行程强相关的节点补充具体信息，避免只写一句"已确认"
+  const detail = (code) => {
+    if (code === 'REMINDED') return `${o.travelDate} ${o.travelTime} 到医院门口接，已确认上车地点与随行人数`
+    if (code === 'DEPARTED') return `司机已从停车场出发，预计 ${o.travelTime} 前到达医院`
+    if (code === 'PICKED') return `已办完出院手续，${o.passengerCount} 人上车，行李 ${o.luggage} 件`
+    if (code === 'ARRIVED') return `已到达${o.address.city}${o.address.district}${o.address.community}，全程 ${o.distanceKm} 公里`
+    return null
+  }
   const steps = TIMELINE_STEPS.map(s => {
     const hit = done.find(t => t.code === s.code)
     return {
       ...s,
       at: hit?.at,
-      desc: hit?.desc || s.desc,
+      desc: (hit && detail(s.code)) || hit?.desc || s.desc,
       actor: hit?.actor,
       state: hit ? (hit.level === 'doing' ? 'doing' : hit.level === 'warn' ? 'warn' : hit.level === 'danger' ? 'danger' : 'done') : 'todo'
     }
@@ -138,6 +146,31 @@ function doCancel() {
 
 function callPhone() {
   window.location.href = 'tel:4008208866'
+}
+
+/* 司机联系方式：不直接展示完整号码，号码只用于拨号 */
+// 司机号码不落到页面上：点击走平台中转号，客户不需要看到真实手机号
+function callDriver() {
+  window.location.href = 'tel:4008208866'
+}
+
+// 车辆/司机信息从"服务确认"开始对客户可见；行前提醒时再加强调
+const showCrew = computed(() => {
+  const s = status.value
+  return !!order.value?.driver && ['CONFIRMED', 'ON_THE_WAY', 'IN_SERVICE', 'COMPLETED'].includes(s)
+})
+const crewActive = computed(() => ['ON_THE_WAY', 'IN_SERVICE'].includes(status.value))
+
+// 车辆与司机卡片只挂在"最近一次与车辆相关"的节点上，避免同一屏重复出现
+const crewNodeCode = computed(() => {
+  if (!showCrew.value) return ''
+  const hit = [...(order.value?.timeline || [])]
+    .filter(t => ['CONFIRMED', 'REMINDED', 'DEPARTED'].includes(t.code))
+    .pop()
+  return hit?.code || ''
+})
+function nodeCrew(code) {
+  return code === crewNodeCode.value
 }
 
 const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' : 'car'))
@@ -255,6 +288,30 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
               <span v-if="s.at" class="tl-time num">{{ formatDateTime(s.at) }}</span>
             </div>
             <div class="tl-desc">{{ s.desc }}</div>
+
+            <!-- 车辆与司机：服务确认/车辆出发节点直接带出，客户不用再去别处找 -->
+            <div v-if="nodeCrew(s.code) && s.state !== 'todo'" class="crew" :class="{ live: crewActive }">
+              <div class="crew-top">
+                <span class="crew-veh"><Icon :name="vehicleIcon" :size="16" /></span>
+                <span class="crew-main">
+                  <span class="crew-plate num">{{ order.driver.plate }}</span>
+                  <span class="crew-model">{{ order.vehicle?.name }}</span>
+                </span>
+                <span v-if="crewActive" class="crew-live"><i />实时</span>
+              </div>
+              <div class="crew-drv">
+                <span class="cd-avatar">{{ order.driver.surname }}</span>
+                <span class="cd-main">
+                  <span class="cd-name">{{ order.driver.surname }}师傅<span class="cd-y">驾龄 {{ order.driver.years }} 年</span></span>
+                  <span class="cd-cert">持证上岗 · 已通过平台背景核验</span>
+                </span>
+                <button class="cd-call" @click="callDriver">
+                  <Icon name="phone" :size="13" />联系司机
+                </button>
+              </div>
+              <p class="crew-tip">号码已做隐私保护，点击由平台中转拨号</p>
+            </div>
+
             <div v-if="s.actor" class="tl-actor">{{ s.actor }}</div>
           </div>
         </div>
@@ -495,6 +552,43 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .tl-time { font-size: 11px; color: var(--ink-3); flex: none; }
 .tl-desc { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; line-height: 1.55; }
 .tl-actor { font-size: 10.5px; color: rgba(60, 60, 67, .32); margin-top: 3px; }
+
+/* 时间轴内嵌的车辆 / 司机卡 */
+.crew {
+  margin: 10px 0 4px; padding: 11px 12px 9px; border-radius: 14px;
+  background: rgba(255, 255, 255, .8); border: 1px solid rgba(60, 60, 67, .08);
+}
+.crew.live { background: var(--brand-tint); border-color: var(--brand-line); }
+.crew-top { display: flex; align-items: center; gap: 9px; padding-bottom: 10px; border-bottom: 1px dashed rgba(60, 60, 67, .12); }
+.crew-veh {
+  width: 30px; height: 30px; border-radius: 10px; flex: none; display: grid; place-items: center;
+  background: var(--grad-sky); color: #fff;
+}
+.crew-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.crew-plate { font-size: 14px; font-weight: 800; letter-spacing: .5px; }
+.crew-model { font-size: 11.5px; color: var(--ink-3); }
+.crew-live {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 4px; flex: none;
+  font-size: 10.5px; font-weight: 700; color: var(--green); background: var(--green-tint);
+  padding: 3px 8px; border-radius: 9px;
+}
+.crew-live i { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+.crew-drv { display: flex; align-items: center; gap: 9px; padding-top: 9px; }
+.cd-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--grad-sky); color: #fff; font-size: 12px; font-weight: 700;
+}
+.cd-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cd-name { font-size: 13px; font-weight: 600; }
+.cd-y { font-size: 11px; color: var(--ink-3); font-weight: 400; margin-left: 5px; }
+.cd-cert { font-size: 10.5px; color: var(--ink-3); }
+.cd-call {
+  margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 4px;
+  height: 30px; padding: 0 11px; border-radius: 15px; font-size: 12px; font-weight: 600;
+  color: var(--brand-ink); background: #fff; border: 1px solid var(--brand-line);
+  box-shadow: 0 3px 8px rgba(255, 102, 0, .1);
+}
+.crew-tip { font-size: 10px; color: var(--ink-3); margin: 8px 0 0; }
 
 .sec-actions { margin-top: 18px; background: var(--card); border: 1px solid rgba(255, 255, 255, .95); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
 .row-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px; border-bottom: 1px solid var(--line); font-size: 14.5px; text-align: left; font-weight: 500; }

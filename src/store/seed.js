@@ -1,7 +1,7 @@
 // 服务记录的示例数据：首次打开时写入，用于展示「订单状态跟踪 + 服务完成评价」
 // 只在本机还没有任何记录时灌一次；清空数据后不会自动重灌，可在平台操作台手动载入
 import { store } from './orders.js'
-import { PROVIDERS } from '../data/providers.js'
+import { PROVIDERS, plateForCity } from '../data/providers.js'
 
 const KEY = 'cy_orders'
 
@@ -83,7 +83,7 @@ function buildOrders() {
     distanceKm: 8,
     provider: p02,
     vehicle: { id: 'V-S1', name: '五座轿车 · 本田雅阁', type: 'sedan', seats: 5, luggage: 3 },
-    driver: { id: 'D01', surname: '王', years: 8, certified: true, plate: '皖A·6K2**', phone: '138****6621' },
+    driver: { id: 'D01', surname: '王', years: 8, certified: true, plate: plateForCity('合肥', 0), phone: '138****6621' },
     timeline: tripTimeline('2026-09-18T11:12:00+08:00', { short: '途安护送' }),
     evaluation: {
       rating: 5,
@@ -109,7 +109,7 @@ function buildOrders() {
     needs: ['协助办理出院手续', '轮椅'],
     provider: p02,
     vehicle: { id: 'V-S1', name: '五座轿车 · 大众帕萨特', type: 'sedan', seats: 5, luggage: 3 },
-    driver: { id: 'D05', surname: '刘', years: 9, certified: true, plate: '皖A·8H7**', phone: '135****2250' },
+    driver: { id: 'D05', surname: '刘', years: 9, certified: true, plate: plateForCity('合肥', 4), phone: '135****2250' },
     timeline: tripTimeline('2026-10-12T15:36:00+08:00', { short: '途安护送' }),
     createdAt: '2026-10-10T09:05:00+08:00',
     updatedAt: '2026-10-12T15:50:00+08:00'
@@ -128,7 +128,7 @@ function buildOrders() {
     distanceKm: 15,
     provider: p01,
     vehicle: { id: 'V-S2', name: '七座商务车 · 别克GL8', type: 'mpv', seats: 7, luggage: 4 },
-    driver: { id: 'D03', surname: '张', years: 11, certified: true, plate: '皖A·9M1**', phone: '136****4472' },
+    driver: { id: 'D03', surname: '张', years: 11, certified: true, plate: plateForCity('合肥', 6), phone: '136****4472' },
     timeline: tripTimeline('2026-06-23T10:02:00+08:00', { short: '安康转运' }),
     evaluation: {
       rating: 4,
@@ -205,7 +205,7 @@ function buildMessages(orders) {
     },
     {
       id: 'MS3011', type: 'system', read: true, orderId: 'CY2610120846',
-      title: '行前提醒', body: '明天 15:00 从安徽医科大学第一附属医院出发，车牌 皖A·8H7**，司机刘师傅。',
+      title: '行前提醒', body: `明天 15:00 从安徽医科大学第一附属医院出发，车牌 ${plateForCity('合肥', 4)}，司机刘师傅。`,
       at: '2026-10-11T16:00:00+08:00'
     },
     {

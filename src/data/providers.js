@@ -61,6 +61,41 @@ export const DRIVERS = [
   { id: 'D05', surname: '刘', years: 9, certified: true, plate: '苏A·2H8**', phone: '135****2250' }
 ]
 
+// 车牌随医院所在城市，避免"合肥的单挂着京牌"这种一眼假
+const PLATE_PREFIX = {
+  北京: '京A', 上海: '沪B', 天津: '津A', 重庆: '渝A', 广州: '粤A', 深圳: '粤B', 东莞: '粤S', 佛山: '粤E',
+  中山: '粤T', 珠海: '粤C', 惠州: '粤L', 杭州: '浙A', 宁波: '浙B', 温州: '浙C', 绍兴: '浙D', 嘉兴: '浙F',
+  南京: '苏A', 无锡: '苏B', 常州: '苏D', 南通: '苏F', 苏州: '苏E', 合肥: '皖A', 济南: '鲁A', 青岛: '鲁B',
+  郑州: '豫A', 长沙: '湘A', 武汉: '鄂A', 成都: '川A', 昆明: '云A', 贵阳: '贵A', 南宁: '桂A', 西安: '陕A',
+  沈阳: '辽A', 大连: '辽B', 长春: '吉A', 哈尔滨: '黑A', 石家庄: '冀A', 太原: '晋A', 唐山: '冀B'
+}
+// 车牌序列号（5 位）。展示时只遮中间两位，首尾保留，客户一眼能认出是哪辆车
+const PLATE_SERIAL = ['8K273', '3F719', '9M152', '5T608', '2H837', '6D425', '7J964', '4C510']
+
+/**
+ * 按城市生成合规车牌，并对中间两位打码：皖A·8K273 → 皖A·8K**3
+ * 只遮中间，首尾留着，用户到场才能对上车。
+ */
+export function maskPlate(plate) {
+  const m = String(plate || '').match(/^(.*·)(.*)$/)
+  if (!m) return plate
+  const [, head, serial] = m
+  if (serial.length < 4) return plate
+  return `${head}${serial.slice(0, 2)}**${serial.slice(-1)}`
+}
+
+/** 按城市生成脱敏车牌，例如 皖A·8K**3 */
+export function plateForCity(city, seed = 0) {
+  const prefix = PLATE_PREFIX[city] || '苏A'
+  return maskPlate(`${prefix}·${PLATE_SERIAL[seed % PLATE_SERIAL.length]}`)
+}
+
+/** 给司机合上属地车牌：司机本身不带车牌，车牌由调度按用车城市下发 */
+export function driverForCity(city, seed = 0) {
+  const d = DRIVERS[seed % DRIVERS.length]
+  return { ...d, plate: plateForCity(city, seed) }
+}
+
 export function providersForCity(city) {
   const list = PROVIDERS.filter(p => p.cities.includes(city))
   return list.length ? list : [PROVIDERS[1]]

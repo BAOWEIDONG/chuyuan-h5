@@ -1,7 +1,7 @@
 // 演示控制台的状态推进：把"平台 / 服务商 / 司机"侧的动作，写成用户端能看到的结果
 import { store } from './orders.js'
 import { canTransition, TIMELINE_STEPS } from '../rules/status.js'
-import { PROVIDERS, providersForCity, VEHICLES, DRIVERS } from '../data/providers.js'
+import { PROVIDERS, providersForCity, VEHICLES, driverForCity } from '../data/providers.js'
 import { addWorkHours } from '../rules/time.js'
 
 function event(code, actor, level = 'done', desc) {
@@ -21,7 +21,7 @@ function attachProvider(order, providerId, vehType) {
   const p = providerId ? PROVIDERS.find(x => x.id === providerId) : pool[0]
   const type = vehType || (order.lieFlatRequired ? 'lieflat' : 'sedan')
   const veh = (VEHICLES[type] || VEHICLES.sedan)[0]
-  const drv = DRIVERS[Math.floor(Math.random() * DRIVERS.length)]
+  const drv = driverForCity(order.hospital.city, Math.floor(Math.random() * 5))
   return {
     provider: { id: p.id, name: p.name, short: p.short, level: p.level, rating: p.rating, orders: p.orders, tags: p.tags },
     vehicle: { id: veh.id, name: veh.name, type: veh.type, seats: veh.seats, luggage: veh.luggage },

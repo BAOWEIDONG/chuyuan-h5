@@ -2,7 +2,7 @@
 import { store } from './orders.js'
 import { STATUS, TIMELINE_STEPS } from '../rules/status.js'
 import { addWorkHours } from '../rules/time.js'
-import { PROVIDERS, VEHICLES, DRIVERS } from '../data/providers.js'
+import { PROVIDERS, VEHICLES, driverForCity } from '../data/providers.js'
 import { HOSPITALS } from '../data/hospitals.js'
 
 function iso(d) { return d.toISOString() }
@@ -59,7 +59,7 @@ function baseOrder(over = {}) {
 function withProvider(order, o = {}) {
   const p = PROVIDERS.find(x => x.id === (o.providerId || 'P02')) || PROVIDERS[1]
   const veh = (VEHICLES[o.vehType || 'sedan'] || VEHICLES.sedan)[0]
-  const drv = DRIVERS[0]
+  const drv = driverForCity(order.hospital.city, 0)
   return {
     ...order,
     provider: { id: p.id, name: p.name, short: p.short, level: p.level, rating: p.rating, orders: p.orders, tags: p.tags },

@@ -34,6 +34,18 @@ function closeNote(o) {
   if (o.closeReason === 'CANCELLED') return o.cancelReason ? `取消原因：${o.cancelReason}` : '客户主动取消'
   return o.closeReason ? `结束原因：${CLOSE_REASON[o.closeReason]}` : ''
 }
+// 进行中的下一步：让列表本身就能看出走到哪儿了
+function nextStep(o) {
+  switch (o.status) {
+    case 'REVIEWING': return '材料核验中，通过后进入派单'
+    case 'NEED_INFO': return '有材料需重新上传'
+    case 'DISPATCHING': return '正在匹配属地服务商'
+    case 'CONFIRMED': return `${o.travelDate} ${o.travelTime} 出行，服务商将提前联系`
+    case 'ON_THE_WAY': return '车辆正在前往医院'
+    case 'IN_SERVICE': return '行程进行中，即将送达'
+    default: return ''
+  }
+}
 function tone(o) {
   if (o.status === 'CLOSED') return o.closeReason === 'REJECTED' ? 'danger' : 'muted'
   return STATUS_META[o.status]?.tone || 'muted'
@@ -70,6 +82,11 @@ function tone(o) {
         <div class="ord-foot">
           <span class="num">{{ o.id }}</span>
           <span>{{ o.travelDate }} {{ o.travelTime }}</span>
+        </div>
+        <div v-if="!['COMPLETED', 'CLOSED'].includes(o.status)" class="ord-live">
+          <span class="lv-dot" />
+          <span class="lv-t">{{ nextStep(o) }}</span>
+          <span class="lv-go">查看进度<Icon name="chevron" :size="12" /></span>
         </div>
         <div v-if="o.status === 'COMPLETED'" class="ord-rate">
           <template v-if="o.evaluation && !o.evaluation.skipped">
@@ -112,6 +129,10 @@ function tone(o) {
 .or-h { font-size: 15px; font-weight: 600; line-height: 1.4; }
 .or-a { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
 .ord-foot { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); margin-top: 14px; padding-top: 11px; border-top: 1px solid var(--line); }
+.ord-live { display: flex; align-items: center; gap: 7px; margin-top: 11px; padding: 9px 11px; border-radius: 12px; background: var(--brand-tint); font-size: 12px; color: var(--brand-ink); line-height: 1.45; }
+.lv-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--brand); box-shadow: 0 0 0 3px rgba(255, 122, 31, .16); }
+.lv-t { flex: 1; min-width: 0; }
+.lv-go { display: inline-flex; align-items: center; gap: 1px; flex: none; font-weight: 600; }
 .ord-close { margin-top: 11px; padding-top: 11px; border-top: 1px dashed rgba(60, 60, 67, .12); font-size: 12px; color: var(--ink-3); line-height: 1.6; }
 .ord-rate { display: flex; align-items: center; gap: 7px; margin-top: 11px; padding-top: 11px; border-top: 1px dashed rgba(60, 60, 67, .12); }
 .stars { display: inline-flex; gap: 1px; }

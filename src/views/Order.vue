@@ -174,6 +174,15 @@ function nodeCrew(code) {
 }
 
 const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' : 'car'))
+
+// 已结束订单的车型文案：完成单给真实车型，未成行的单明确写"未派车"，不用"按需适配"这种含糊说法
+const closedVehicleText = computed(() => {
+  const o = order.value
+  if (!o) return ''
+  if (o.status !== 'COMPLETED') return '未派车'
+  if (o.tripType === 'long') return '火车 / 飞机 · 被保人+1家属'
+  return o.vehicle?.name || '按需适配'
+})
 </script>
 
 <template>
@@ -269,8 +278,10 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
           <div><span class="k">同行人数</span><span class="v">{{ order.passengerCount }} 人</span></div>
           <div><span class="k">{{ order.tripType === 'long' ? '票务方案' : '车型' }}</span><span class="v">{{ order.tripType === 'long' ? '火车 / 飞机 · 被保人+1家属' : (order.vehicle?.name || '按需适配') }}</span></div>
           <div><span class="k">测算里程</span><span class="v">{{ order.distanceKm }} 公里</span></div>
-          <div><span class="k">联系人</span><span class="v">{{ order.contact.name }} {{ order.contact.phone }}</span></div>
+          <div><span class="k">同行人</span><span class="v">{{ order.contact.name }} {{ order.contact.phone }}</span></div>
           <div><span class="k">特殊需求</span><span class="v">{{ order.needs?.length ? order.needs.join('、') : '无' }}</span></div>
+          <div><span class="k">受理时间</span><span class="v">{{ formatDateTime(order.createdAt) }}</span></div>
+          <div><span class="k">费用</span><span class="v free">权益范围内，无额外费用</span></div>
         </div>
       </section>
 
@@ -331,28 +342,99 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
       </p>
     </div>
 
-    <!-- 已结束 -->
+    <!-- 已结束：与进行中保持同一套信息结构，不删字段 -->
     <div class="page" v-else>
-      <section class="closed-head">
-        <div class="ch-icon" :class="order.status === 'COMPLETED' ? 'ok' : 'warn'">
-          <Icon :name="order.status === 'COMPLETED' ? 'check' : 'info'" :size="22" />
+      <section class="status-head">
+        <div class="sh-top">
+          <span class="badge" :class="meta.tone">{{ meta.label }}</span>
+          <span class="tiny muted num">{{ order.id }}</span>
         </div>
-        <h1 class="ch-title">{{ headline.t }}</h1>
-        <p class="ch-desc">{{ headline.d }}</p>
+        <div class="ch-icon" :class="order.status === 'COMPLETED' ? 'ok' : 'warn'">
+          <Icon :name="order.status === 'COMPLETED' ? 'check' : 'info'" :size="20" />
+        </div>
+        <h1 class="sh-title">{{ headline.t }}</h1>
+        <p class="sh-desc">{{ headline.d }}</p>
       </section>
 
-      <div v-if="order.status === 'COMPLETED'" class="card">
-        <div class="sum-row"><span>行程</span><span>{{ order.hospital.name }} → {{ order.address.city }}{{ order.address.district }}{{ order.address.community }}</span></div>
-        <div class="sum-row"><span>出行时间</span><span>{{ order.travelDate }} {{ order.travelTime }}</span></div>
-        <div class="sum-row"><span>服务商</span><span>{{ order.provider?.name }}</span></div>
-        <div class="sum-row"><span>车辆</span><span>{{ order.vehicle?.name }}</span></div>
-        <div class="sum-row" style="border-bottom:0"><span>费用</span><span class="free">权益范围内，无额外费用</span></div>
-        <button v-if="!order.evaluation" class="btn btn-primary" style="margin-top:14px" @click="router.push('/order/' + order.id + '/review')">评价本次服务</button>
-        <div v-else-if="order.evaluation.skipped" class="rated" style="justify-content:space-between">
-          <span class="tiny muted">已跳过评价</span>
-          <button class="rate-later" @click="router.push('/order/' + order.id + '/review')">补评价</button>
+      <!-- 服务商（已结束同样展示，便于回溯是哪家提供的服务） -->
+      <section v-if="order.provider" class="card prov">
+        <div class="pv-head">
+          <div class="pv-logo">{{ order.provider.short.slice(0, 1) }}</div>
+          <div class="pv-main">
+            <div class="pv-name">{{ order.provider.name }}</div>
+            <div class="pv-meta">
+              <span class="rate"><Icon name="star" :size="12" /> {{ order.provider.rating }}</span>
+              <span>·</span>
+              <span>累计服务 {{ order.provider.orders.toLocaleString() }} 单</span>
+            </div>
+          </div>
+          <span class="pv-level">{{ order.provider.level }} 级</span>
         </div>
-        <div v-else class="eval">
+        <div class="pv-tags">
+          <span v-for="t in order.provider.tags" :key="t" class="pv-tag">{{ t }}</span>
+        </div>
+        <template v-if="order.driver">
+          <div class="divider" />
+          <div class="drv">
+            <div class="drv-avatar">{{ order.driver.surname }}</div>
+            <div class="drv-main">
+              <div class="drv-name">{{ order.driver.surname }}师傅<span class="tiny muted"> · 驾龄 {{ order.driver.years }} 年</span></div>
+              <div class="drv-car">{{ order.vehicle?.name }} · <span class="num">{{ order.driver.plate }}</span></div>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <section class="card trip">
+        <div class="trip-route">
+          <div class="tr-item">
+            <span class="tr-dot" />
+            <div>
+              <div class="tr-k">出发 · 医院</div>
+              <div class="tr-v">{{ order.hospital.name }}</div>
+              <div class="tr-s">{{ order.hospital.city }}{{ order.hospital.district }} · {{ order.hospital.level }}</div>
+            </div>
+          </div>
+          <div class="tr-line" />
+          <div class="tr-item">
+            <span class="tr-dot hollow" />
+            <div>
+              <div class="tr-k">到达 · 家庭常住地</div>
+              <div class="tr-v">{{ order.address.city }}{{ order.address.district }}{{ order.address.community }}</div>
+              <div class="tr-s">单次直达，不支持中途停靠</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="trip-grid">
+          <div><span class="k">出行时间</span><span class="v">{{ order.travelDate }} {{ order.travelTime }}</span></div>
+          <div><span class="k">同行人数</span><span class="v">{{ order.passengerCount }} 人</span></div>
+          <div><span class="k">{{ order.tripType === 'long' ? '票务方案' : '车型' }}</span><span class="v">{{ closedVehicleText }}</span></div>
+          <div><span class="k">测算里程</span><span class="v">{{ order.distanceKm }} 公里</span></div>
+          <div><span class="k">同行人</span><span class="v">{{ order.contact.name }} {{ order.contact.phone }}</span></div>
+          <div><span class="k">特殊需求</span><span class="v">{{ order.needs?.length ? order.needs.join('、') : '无' }}</span></div>
+          <div><span class="k">受理时间</span><span class="v">{{ formatDateTime(order.createdAt) }}</span></div>
+          <div><span class="k">{{ order.status === 'COMPLETED' ? '完成时间' : '结束时间' }}</span><span class="v">{{ formatDateTime(order.timeline?.[order.timeline.length - 1]?.at) }}</span></div>
+          <div class="full"><span class="k">费用</span><span class="v" :class="{ free: order.status === 'COMPLETED' }">{{ order.status === 'COMPLETED' ? '权益范围内，无额外费用' : '未产生费用，本次住院权益未使用' }}</span></div>
+        </div>
+      </section>
+
+      <!-- 评价 -->
+      <div v-if="order.status === 'COMPLETED'" class="card eval-card">
+        <template v-if="!order.evaluation">
+          <div class="ec-head">
+            <span class="ec-t">本次服务还没有评价</span>
+            <span class="ec-d">你的反馈会同步给服务商与平台</span>
+          </div>
+          <button class="btn btn-primary" style="margin-top:12px" @click="router.push('/order/' + order.id + '/review')">评价本次服务</button>
+        </template>
+        <template v-else-if="order.evaluation.skipped">
+          <div class="rated" style="justify-content:space-between;margin-top:0">
+            <span class="tiny muted">你已跳过本次评价</span>
+            <button class="rate-later" @click="router.push('/order/' + order.id + '/review')">补评价</button>
+          </div>
+        </template>
+        <div v-else class="eval" style="margin-top:0">
           <div class="ev-head">
             <span class="ev-l">我的评价</span>
             <span class="stars">
@@ -367,12 +449,6 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
           <p v-if="order.evaluation.note" class="ev-note">{{ order.evaluation.note }}</p>
           <div class="ev-time tiny muted num">{{ formatDateTime(order.evaluation.at) }}</div>
         </div>
-      </div>
-
-      <div class="card" v-else>
-        <div class="sum-row"><span>就诊医院</span><span>{{ order.hospital.name }}</span></div>
-        <div class="sum-row"><span>受理编号</span><span class="num">{{ order.id }}</span></div>
-        <div class="sum-row" style="border-bottom:0"><span>出行时间</span><span>{{ order.travelDate }} {{ order.travelTime }}</span></div>
       </div>
 
       <div class="section-title"><span class="t">服务进度</span><span class="s">共 {{ order.timeline?.length || 0 }} 个节点</span></div>
@@ -391,6 +467,25 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
               <span class="tl-time num">{{ formatDateTime(s.at) }}</span>
             </div>
             <div class="tl-desc">{{ s.desc }}</div>
+
+            <div v-if="nodeCrew(s.code)" class="crew">
+              <div class="crew-top">
+                <span class="crew-veh"><Icon :name="vehicleIcon" :size="16" /></span>
+                <span class="crew-main">
+                  <span class="crew-plate num">{{ order.driver.plate }}</span>
+                  <span class="crew-model">{{ order.vehicle?.name }}</span>
+                </span>
+              </div>
+              <div class="crew-drv">
+                <span class="cd-avatar">{{ order.driver.surname }}</span>
+                <span class="cd-main">
+                  <span class="cd-name">{{ order.driver.surname }}师傅<span class="cd-y">驾龄 {{ order.driver.years }} 年</span></span>
+                  <span class="cd-cert">持证上岗 · 已通过平台背景核验</span>
+                </span>
+              </div>
+            </div>
+
+            <div v-if="s.actor" class="tl-actor">{{ s.actor }}</div>
           </div>
         </div>
       </section>
@@ -524,6 +619,7 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .tr-s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
 .trip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px 14px; margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--line); }
 .trip-grid .k { display: block; font-size: 11px; color: var(--ink-3); }
+.trip-grid .full { grid-column: 1 / -1; }
 .trip-grid .v { display: block; font-size: 13.5px; margin-top: 3px; line-height: 1.4; font-weight: 500; }
 
 .tl-card { padding: 18px 16px 6px; }
@@ -597,7 +693,10 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .row-btn.danger { color: var(--red); }
 
 .closed-head { text-align: center; padding: 26px 10px 18px; }
-.ch-icon { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 15px; }
+/* 已结束页的状态区：与进行中同宽，图标居中放在标题上方 */
+.status-head .ch-icon { margin-top: 16px; margin-bottom: 0; }
+.status-head .ch-title { font-size: 26px; margin-top: 12px; }
+.ch-icon { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 15px; }
 .ch-icon.ok { background: var(--green-tint); color: var(--green); }
 .ch-icon.warn { background: var(--red-tint); color: var(--red); }
 .ch-title { font-size: 22px; font-weight: 800; margin: 0; }
@@ -614,6 +713,10 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .cancel-done { padding: 40px; text-align: center; }
 .cd-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--green-tint); color: var(--green); display: grid; place-items: center; margin: 0 auto 12px; }
 
+.eval-card { margin-top: 12px; }
+.ec-head { display: flex; flex-direction: column; gap: 4px; }
+.ec-t { font-size: 14px; font-weight: 700; }
+.ec-d { font-size: 12px; color: var(--ink-3); }
 .eval { margin-top: 14px; padding: 13px 14px; border-radius: 16px; background: var(--brand-tint); border: 1px solid var(--brand-line); }
 .ev-head { display: flex; align-items: center; gap: 8px; }
 .ev-l { font-size: 13px; font-weight: 700; color: var(--brand-ink); }

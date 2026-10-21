@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import NavBar from '../components/NavBar.vue'
 import ProgressDots from '../components/ProgressDots.vue'
 import HospitalPicker from '../components/HospitalPicker.vue'
@@ -296,7 +297,7 @@ const hospLevel = computed(() => hospital.value ? `${hospital.value.level} · ${
         </div>
       </div>
       <p class="tiny muted" style="margin:10px 4px 0;line-height:1.7">
-        手机号取自保单预留号码。如已变更，请联系平台客服更新后再预约。
+        手机号取自保单预留号码。如已变更，请拨打 <CallLink inline bare :icon="false" /> 更新后再预约。
       </p>
 
       <p class="tiny muted" style="margin:22px 4px 0;line-height:1.7">

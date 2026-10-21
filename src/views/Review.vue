@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
 import NavBar from '../components/NavBar.vue'
+import CallLink from '../components/CallLink.vue'
 import { store } from '../store/orders.js'
 import { REVIEW_TAGS, RATING_TEXT } from '../rules/review.js'
 
@@ -72,7 +73,7 @@ function submit(skip = false) {
 
       <div class="comp">
         <div class="comp-t small">服务有问题？</div>
-        <div class="comp-d tiny muted">可拨打 400-820-8866 反馈，平台将在 1 个工作日内联系你。</div>
+        <div class="comp-d tiny muted">可拨打 <CallLink inline bare :icon="false" /> 反馈，平台将在 1 个工作日内联系你。</div>
       </div>
     </div>
   </div>

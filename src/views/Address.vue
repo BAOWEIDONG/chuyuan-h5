@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import NavBar from '../components/NavBar.vue'
 import AddressPicker from '../components/AddressPicker.vue'
 import { store } from '../store/orders.js'
@@ -39,7 +40,7 @@ function save(a) {
         </div>
         <div class="ac-lock">
           <Icon name="shield" :size="14" />
-          <span>地址已锁定。如需变更，请联系平台客服并重新提供住址证明。</span>
+          <span>地址已锁定。如需变更，请拨打 <CallLink inline bare :icon="false" /> 并重新提供住址证明。</span>
         </div>
       </div>
 

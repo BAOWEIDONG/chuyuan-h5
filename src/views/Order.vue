@@ -144,16 +144,6 @@ function doCancel() {
   setTimeout(() => { showCancel.value = false }, 900)
 }
 
-function callPhone() {
-  window.location.href = 'tel:4008208866'
-}
-
-/* 司机联系方式：不直接展示完整号码，号码只用于拨号 */
-// 司机号码不落到页面上：点击走平台中转号，客户不需要看到真实手机号
-function callDriver() {
-  window.location.href = 'tel:4008208866'
-}
-
 // 车辆/司机信息从"服务确认"开始对客户可见；行前提醒时再加强调
 const showCrew = computed(() => {
   const s = status.value
@@ -246,7 +236,7 @@ const closedVehicleText = computed(() => {
               <div class="drv-name">{{ order.driver.surname }}师傅<span class="tiny muted"> · 驾龄 {{ order.driver.years }} 年</span></div>
               <div class="drv-car">{{ order.vehicle?.name }} · <span class="num">{{ order.driver.plate }}</span></div>
             </div>
-            <button class="drv-call" aria-label="联系司机" @click="callPhone"><Icon name="phone" :size="17" /></button>
+            <a class="drv-call" href="tel:4008208866" aria-label="联系司机"><Icon name="phone" :size="17" /></a>
           </div>
         </template>
       </section>
@@ -316,9 +306,9 @@ const closedVehicleText = computed(() => {
                   <span class="cd-name">{{ order.driver.surname }}师傅<span class="cd-y">驾龄 {{ order.driver.years }} 年</span></span>
                   <span class="cd-cert">持证上岗 · 已通过平台背景核验</span>
                 </span>
-                <button class="cd-call" @click="callDriver">
+                <a class="cd-call" href="tel:4008208866">
                   <Icon name="phone" :size="13" />联系司机
-                </button>
+                </a>
               </div>
               <p class="crew-tip">号码已做隐私保护，点击由平台中转拨号</p>
             </div>
@@ -494,20 +484,20 @@ const closedVehicleText = computed(() => {
         <button class="row-btn" @click="router.push('/rules')">
           <Icon name="book" :size="17" /><span>查看服务规则</span><Icon class="chev" name="chevron" :size="16" />
         </button>
-        <button class="row-btn" @click="callPhone">
-          <Icon name="phone" :size="17" /><span>联系平台客服</span><Icon class="chev" name="chevron" :size="16" />
-        </button>
+        <a class="row-btn" href="tel:4008208866">
+          <Icon name="phone" :size="17" /><span>联系平台客服 400-820-8866</span><Icon class="chev" name="chevron" :size="16" />
+        </a>
       </div>
     </div>
 
     <!-- 底部固定条 -->
     <div class="action-bar" v-if="!isClosed">
-      <button class="btn btn-ghost" style="flex:1" @click="callPhone">
+      <a class="btn btn-ghost" style="flex:1" href="tel:4008208866">
         <Icon name="phone" :size="16" /> 平台客服
-      </button>
-      <button v-if="order.driver" class="btn btn-primary" style="flex:1.2" @click="callPhone">
+      </a>
+      <a v-if="order.driver" class="btn btn-primary" style="flex:1.2" href="tel:4008208866">
         <Icon name="phone" :size="16" /> 联系司机
-      </button>
+      </a>
       <button v-else class="btn btn-primary" style="flex:1.2" @click="router.push('/messages')">查看消息</button>
     </div>
 
@@ -521,7 +511,7 @@ const closedVehicleText = computed(() => {
               <div class="sheet-body">
                 <div v-if="cancelBlocked" class="alert danger">
                   <Icon name="alert" :size="17" />
-                  <span>车辆已出发，无法自助取消。如需取消请联系服务商或平台客服处理。</span>
+                  <span>车辆已出发，无法自助取消。如需取消请联系服务商，或拨打 <a class="inl-tel" href="tel:4008208866">400-820-8866</a>。</span>
                 </div>
                 <template v-else>
                   <p class="small" style="margin:0 0 12px;color:var(--ink-2)">
@@ -541,7 +531,7 @@ const closedVehicleText = computed(() => {
               </div>
               <div class="sheet-foot">
                 <button v-if="!cancelBlocked" class="btn btn-danger" style="width:100%" :disabled="!cancelReason" @click="doCancel">确认取消申请</button>
-                <button v-else class="btn btn-primary" style="width:100%" @click="callPhone">拨打客服 400-820-8866</button>
+                <a v-else class="btn btn-primary" style="width:100%" href="tel:4008208866">拨打客服 400-820-8866</a>
               </div>
             </template>
             <div v-else class="cancel-done">
@@ -604,7 +594,7 @@ const closedVehicleText = computed(() => {
 .drv-main { flex: 1; min-width: 0; }
 .drv-name { font-size: 14px; font-weight: 600; }
 .drv-car { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
-.drv-call {
+.drv-call { text-decoration: none;
   width: 38px; height: 38px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center;
   box-shadow: 0 6px 14px rgba(255, 90, 0, .26);
 }
@@ -727,4 +717,7 @@ const closedVehicleText = computed(() => {
 .ev-note { font-size: 12.5px; color: var(--ink-2); line-height: 1.65; margin: 10px 0 0; }
 .ev-time { margin-top: 8px; }
 .rate-later { font-size: 12px; color: var(--brand-ink); font-weight: 600; padding: 4px 2px; }
+
+/* 说明文字里的电话号码：可点直拨 */
+.inl-tel { color: var(--brand-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 </style>

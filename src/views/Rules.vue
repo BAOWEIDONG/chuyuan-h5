@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import NavBar from '../components/NavBar.vue'
 import PickerSheet from '../components/PickerSheet.vue'
 import { PROVINCES } from '../data/cities.js'
@@ -97,7 +98,7 @@ const FAQ = [
         <div v-if="cityResult" class="city-result" :class="cityResult.ok ? 'ok' : 'no'">
           <Icon :name="cityResult.ok ? 'check' : 'close'" :size="16" />
           <span v-if="cityResult.ok">{{ cityResult.city }} 已开通，服务范围为其市辖区</span>
-          <span v-else>{{ cityResult.city }} 暂未开通，可拨打 400-820-8866 查询最新服务城市</span>
+          <span v-else>{{ cityResult.city }} 暂未开通，可拨打 <CallLink inline bare :icon="false" /> 查询最新服务城市</span>
         </div>
         <p class="tiny muted" style="margin:10px 0 0">服务覆盖市辖区，不含下辖县、县级市（江苏、浙江、重庆部分区域除外）；不含港澳台及境外。</p>
       </div>

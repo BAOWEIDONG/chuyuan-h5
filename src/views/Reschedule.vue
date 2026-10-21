@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import NavBar from '../components/NavBar.vue'
 import DatePicker from '../components/DatePicker.vue'
 import TimePicker from '../components/TimePicker.vue'
@@ -121,11 +122,11 @@ function submit() {
 
       <div v-if="tooLate" class="alert danger" style="margin-top:14px">
         <Icon name="alert" :size="17" />
-        <span>距离约定时间不足 4 个工作小时，无法自助变更。请联系服务商或平台客服协调。</span>
+        <span>距离约定时间不足 4 个工作小时，无法自助变更。请联系服务商，或拨打 <CallLink inline bare :icon="false" /> 协调。</span>
       </div>
       <div v-if="overLimit" class="alert danger" style="margin-top:14px">
         <Icon name="alert" :size="17" />
-        <span>本次申请已变更 2 次，如需再次调整请联系平台客服。</span>
+        <span>本次申请已变更 2 次，如需再次调整请拨打 <CallLink inline bare :icon="false" />。</span>
       </div>
 
       <div class="summary" v-if="newMoment && !dateErr && !unchanged">

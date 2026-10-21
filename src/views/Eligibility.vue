@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import NavBar from '../components/NavBar.vue'
 import ProgressDots from '../components/ProgressDots.vue'
 import { ELIGIBILITY_QUESTIONS } from '../rules/eligibility.js'
@@ -76,10 +77,11 @@ function back() {
 
         <div class="card" style="margin-top:20px">
           <div class="h3">你可以这样做</div>
-          <div class="opt" style="padding-top:12px">
-            <span class="main"><span class="l">拨打 400-820-8866 咨询</span><span class="d">确认是否有其他可用的服务权益</span></span>
+          <a class="opt call-row" href="tel:4008208866" style="padding-top:12px">
+            <span class="call-ic"><Icon name="phone" :size="15" /></span>
+            <span class="main"><span class="l">拨打客服电话咨询</span><span class="d">400-820-8866 · 确认是否有其他可用的服务权益</span></span>
             <Icon class="chev" name="chevron" :size="17" />
-          </div>
+          </a>
           <div class="opt">
             <span class="main"><span class="l">联系医院安排救护车</span><span class="d">需要医疗支持或病情不稳定时，请由医院安排</span></span>
           </div>
@@ -145,4 +147,12 @@ function back() {
 .reapply { display: block; width: 100%; margin-top: 12px; font-size: 12px; color: var(--ink-3); text-align: center; padding: 6px; }
 .block { text-align: center; display: flex; flex-direction: column; align-items: center; }
 .block-icon { width: 60px; height: 60px; border-radius: 50%; background: var(--red-tint); color: var(--red); display: grid; place-items: center; }
+
+/* 可拨号行：整行点击即调起系统拨号 */
+.call-row { text-decoration: none; color: inherit; }
+.call-ic {
+  width: 30px; height: 30px; border-radius: 10px; flex: none; display: grid; place-items: center;
+  background: var(--brand-tint); color: var(--brand); border: 1px solid var(--brand-line);
+}
+.call-row:active { opacity: .7; }
 </style>

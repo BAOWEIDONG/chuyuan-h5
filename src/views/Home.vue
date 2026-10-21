@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
+import CallLink from '../components/CallLink.vue'
 import { session } from '../store/session.js'
 import { store, activeOrder, unreadCount } from '../store/orders.js'
 import { STATUS_META, CLOSE_REASON } from '../rules/status.js'
@@ -160,7 +161,7 @@ const entries = computed(() => [
 
     <footer class="home-foot">
       <p>本服务为非医疗类、非急救类的普通交通接送，由服务方协调属地运力提供。</p>
-      <p class="num">服务时间 工作日 9:00–21:00 · 客服 400-820-8866</p>
+      <p>服务时间 工作日 9:00–21:00 · <CallLink inline :icon="false" /></p>
     </footer>
   </div>
 </template>

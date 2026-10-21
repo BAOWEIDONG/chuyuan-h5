@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
 import NavBar from '../components/NavBar.vue'
 import { store } from '../store/orders.js'
+import { REVIEW_TAGS, RATING_TEXT } from '../rules/review.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,16 +15,9 @@ const tags = ref([])
 const note = ref('')
 const done = ref(false)
 
-const TAGS = [
-  { value: 'ontime', label: '准时到达' },
-  { value: 'driver', label: '司机专业' },
-  { value: 'clean', label: '车辆整洁' },
-  { value: 'comm', label: '沟通顺畅' },
-  { value: 'help', label: '上下车有帮手' },
-  { value: 'quiet', label: '安静不打扰' }
-]
+const TAGS = REVIEW_TAGS
 
-const ratingText = computed(() => ['', '很不满意', '不满意', '一般', '满意', '非常满意'][rating.value])
+const ratingText = computed(() => RATING_TEXT[rating.value])
 
 function toggleTag(v) {
   const i = tags.value.indexOf(v)
@@ -52,7 +46,7 @@ function submit(skip = false) {
 
       <div class="stars">
         <button v-for="n in 5" :key="n" class="star-btn" :aria-label="`${n} 星`" @click="rating = n">
-          <Icon name="star" :size="34" :style="{ color: n <= rating ? '#FF8A1F' : 'rgba(60,60,67,.16)' }" />
+          <Icon name="star" :size="34" :fill="n <= rating" :style="{ color: n <= rating ? '#FF8A1F' : 'rgba(60,60,67,.22)' }" />
         </button>
       </div>
       <div class="rating-text">{{ ratingText }}</div>

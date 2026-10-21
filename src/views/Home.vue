@@ -11,6 +11,8 @@ const router = useRouter()
 const member = computed(() => session.member || {})
 const order = computed(() => activeOrder.value)
 const latestClosed = computed(() => store.orders.find(o => ['COMPLETED', 'CLOSED'].includes(o.status)))
+// 已完成但还没评价的上一单：首页提醒，避免评价入口被埋进服务记录
+const toRate = computed(() => store.orders.find(o => o.status === 'COMPLETED' && !o.evaluation))
 const remaining = computed(() => member.value.remaining ?? 1)
 
 const statusText = computed(() => (order.value ? STATUS_META[order.value.status]?.label || '' : ''))
@@ -121,6 +123,15 @@ const entries = computed(() => [
       <span>本次住院的出院交通权益已使用，同一次住院仅提供 1 次服务。</span>
     </div>
 
+    <button v-if="toRate" class="rate-card" @click="router.push('/order/' + toRate.id + '/review')">
+      <span class="rc-ic"><Icon name="star" :size="17" /></span>
+      <span class="rc-main">
+        <span class="rc-t">本次出行已完成，给个评价吧</span>
+        <span class="rc-d">{{ toRate.travelDate }} · {{ toRate.provider?.short || '服务商' }}</span>
+      </span>
+      <span class="rc-go">去评价<Icon name="chevron" :size="14" /></span>
+    </button>
+
     <!-- 尚未预约：把流程铺出来，避免下半屏空着 -->
     <section v-if="!order" class="guide">
       <div class="gd-h">
@@ -138,7 +149,8 @@ const entries = computed(() => [
       </ol>
     </section>
 
-    <button v-if="latestClosed" class="last-done" @click="router.push('/order/' + latestClosed.id)">
+    <!-- 有待评价时上方已有提醒，不再重复最近一条 -->
+    <button v-if="latestClosed && !toRate" class="last-done" @click="router.push('/order/' + latestClosed.id)">
       <span class="ld-l">
         <Icon name="check" :size="14" />
         最近一条 · {{ CLOSE_REASON[latestClosed.closeReason] || STATUS_META[latestClosed.status].label }}
@@ -252,6 +264,16 @@ const entries = computed(() => [
 .tile-t { font-size: 15px; font-weight: 700; }
 .tile-d { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+.rate-card {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  margin-top: 14px; padding: 13px 14px; border-radius: 18px;
+  background: var(--brand-tint); border: 1px solid var(--brand-line);
+}
+.rc-ic { width: 34px; height: 34px; border-radius: 11px; flex: none; display: grid; place-items: center; background: var(--grad); color: #fff; box-shadow: 0 6px 12px rgba(255, 90, 0, .24); }
+.rc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.rc-t { font-size: 13.5px; font-weight: 700; color: var(--brand-ink); }
+.rc-d { font-size: 11.5px; color: var(--ink-3); }
+.rc-go { display: inline-flex; align-items: center; gap: 1px; font-size: 12px; font-weight: 600; color: var(--brand-ink); flex: none; }
 .guide { margin-top: 20px; padding: 16px 16px 6px; border-radius: 20px; background: rgba(255,255,255,.66); border: 1px solid rgba(255,255,255,.9); }
 .gd-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
 .gd-t { font-size: 14px; font-weight: 800; }

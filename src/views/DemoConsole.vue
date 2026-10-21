@@ -5,6 +5,7 @@ import Icon from '../components/Icon.vue'
 import NavBar from '../components/NavBar.vue'
 import { store } from '../store/orders.js'
 import { SCENARIOS, loadScenario, resetAll } from '../store/demo.js'
+import { seedDemoOrders } from '../store/seed.js'
 import { advanceOrder, escalateOrder, rejectOrder, noVehicle, needInfo, delayDriver } from '../store/advance.js'
 import { STATUS_META, CLOSE_REASON } from '../rules/status.js'
 import { formatDateTime } from '../rules/time.js'
@@ -63,6 +64,12 @@ function statusTone(o) {
   return STATUS_META[o.status]?.tone || 'muted'
 }
 
+// 一键恢复示例服务记录：覆盖当前本机订单，用于演示历史记录与评价
+function loadSeed() {
+  seedDemoOrders({ force: true })
+  say('示例服务记录已载入（5 条）')
+}
+
 function reset() {
   resetAll()
   say('演示数据已清空')
@@ -101,6 +108,14 @@ const shortcuts = [
 
       <!-- 场景预设 -->
       <div v-if="tab === 'scenario'" class="list">
+        <button class="sc seed" @click="loadSeed">
+          <span class="sc-ic"><Icon name="list" :size="17" /></span>
+          <div class="sc-main">
+            <div class="sc-n">示例服务记录</div>
+            <div class="sc-d">5 条历史订单：已评价 2 条、待评价 1 条、已取消、审核未通过</div>
+          </div>
+          <Icon name="chevron" :size="16" class="muted" />
+        </button>
         <button v-for="s in SCENARIOS" :key="s.key" class="sc" @click="load(s.key)">
           <div class="sc-main">
             <div class="sc-n">{{ s.name }}</div>
@@ -179,6 +194,8 @@ const shortcuts = [
   box-shadow: var(--shadow-sm);
 }
 .sc-main { flex: 1; min-width: 0; }
+.sc.seed { border-color: var(--brand-line); background: var(--brand-tint); }
+.sc-ic { width: 32px; height: 32px; border-radius: 10px; flex: none; display: grid; place-items: center; background: var(--grad); color: #fff; }
 .sc-n { font-size: 15px; font-weight: 700; }
 .sc-d { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
 

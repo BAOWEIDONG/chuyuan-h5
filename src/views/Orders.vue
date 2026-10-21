@@ -6,6 +6,7 @@ import NavBar from '../components/NavBar.vue'
 import { store } from '../store/orders.js'
 import { STATUS_META, CLOSE_REASON } from '../rules/status.js'
 import { formatDateTime } from '../rules/time.js'
+import { RATING_TEXT } from '../rules/review.js'
 
 const router = useRouter()
 const tab = ref('all')
@@ -26,6 +27,12 @@ const list = computed(() => {
 function label(o) {
   if (o.status === 'CLOSED') return CLOSE_REASON[o.closeReason] || '已结束'
   return STATUS_META[o.status]?.label || ''
+}
+// 已结束订单补一句原因，避免列表里只有状态标签看不出为什么
+function closeNote(o) {
+  if (o.closeReason === 'REJECTED') return o.rejectReason || '不符合服务条件'
+  if (o.closeReason === 'CANCELLED') return o.cancelReason ? `取消原因：${o.cancelReason}` : '客户主动取消'
+  return o.closeReason ? `结束原因：${CLOSE_REASON[o.closeReason]}` : ''
 }
 function tone(o) {
   if (o.status === 'CLOSED') return o.closeReason === 'REJECTED' ? 'danger' : 'muted'
@@ -64,7 +71,23 @@ function tone(o) {
           <span class="num">{{ o.id }}</span>
           <span>{{ o.travelDate }} {{ o.travelTime }}</span>
         </div>
-        <button v-if="o.status === 'COMPLETED' && !o.evaluation" class="rate-btn" @click.stop="router.push('/order/' + o.id + '/review')">去评价</button>
+        <div v-if="o.status === 'COMPLETED'" class="ord-rate">
+          <template v-if="o.evaluation && !o.evaluation.skipped">
+            <span class="stars">
+              <Icon v-for="n in 5" :key="n" name="star" :size="13" :fill="n <= o.evaluation.rating"
+                :style="{ color: n <= o.evaluation.rating ? '#FF8A1F' : 'rgba(60,60,67,.22)' }" />
+            </span>
+            <span class="rate-txt">{{ RATING_TEXT[o.evaluation.rating] }} · 已评价</span>
+            <span class="rate-act">查看</span>
+          </template>
+          <template v-else>
+            <span class="rate-txt muted">{{ o.evaluation ? '已跳过评价' : '已完成，待评价' }}</span>
+            <button v-if="!o.evaluation" class="rate-btn" @click.stop="router.push('/order/' + o.id + '/review')">去评价</button>
+          </template>
+        </div>
+        <div v-else class="ord-close">
+          <span>{{ closeNote(o) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -83,15 +106,21 @@ function tone(o) {
 .tab.on { background: var(--grad); color: #fff; border-color: transparent; font-weight: 700; box-shadow: 0 6px 14px rgba(255, 90, 0, .22); }
 .cnt { font-size: 10.5px; background: var(--fill-2); color: var(--ink-2); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
 .tab.on .cnt { background: rgba(255, 255, 255, .26); color: #fff; }
-.ord { margin-top: 12px; position: relative; padding-right: 16px; }
+.ord { margin-top: 12px; }
 .ord-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .ord-route { margin-top: 13px; }
 .or-h { font-size: 15px; font-weight: 600; line-height: 1.4; }
 .or-a { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
 .ord-foot { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); margin-top: 14px; padding-top: 11px; border-top: 1px solid var(--line); }
+.ord-close { margin-top: 11px; padding-top: 11px; border-top: 1px dashed rgba(60, 60, 67, .12); font-size: 12px; color: var(--ink-3); line-height: 1.6; }
+.ord-rate { display: flex; align-items: center; gap: 7px; margin-top: 11px; padding-top: 11px; border-top: 1px dashed rgba(60, 60, 67, .12); }
+.stars { display: inline-flex; gap: 1px; }
+.rate-txt { font-size: 12px; color: var(--ink-2); }
+.rate-txt.muted { color: var(--ink-3); }
+.rate-act { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
 .rate-btn {
-  position: absolute; right: 16px; bottom: 13px; font-size: 12px; color: #fff;
-  background: var(--grad); padding: 6px 13px; border-radius: 14px; font-weight: 600;
+  margin-left: auto; font-size: 12px; color: #fff;
+  background: var(--grad); padding: 6px 14px; border-radius: 14px; font-weight: 600;
   box-shadow: 0 5px 12px rgba(255, 90, 0, .24);
 }
 .empty-card { margin-top: 16px; padding: 30px 20px 22px; text-align: center; }

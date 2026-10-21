@@ -7,6 +7,7 @@ import Countdown from '../components/Countdown.vue'
 import { store } from '../store/orders.js'
 import { STATUS_META, CLOSE_REASON, TIMELINE_STEPS } from '../rules/status.js'
 import { formatDateTime, workHoursBetween } from '../rules/time.js'
+import { RATING_TEXT, tagLabel } from '../rules/review.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -46,7 +47,14 @@ const headline = computed(() => {
     case 'IN_SERVICE':
       return { t: '行程进行中', d: '已接到客户，前往家庭常住地。' }
     case 'COMPLETED':
-      return { t: '服务已完成', d: '行程已送达，欢迎对本次服务做出评价。' }
+      return {
+        t: '服务已完成',
+        d: o.evaluation && !o.evaluation.skipped
+          ? '行程已送达，感谢你的评价与反馈。'
+          : o.evaluation
+            ? '行程已送达，你已跳过本次评价，仍可随时补充。'
+            : '行程已送达，欢迎对本次服务做出评价。'
+      }
     case 'CLOSED':
       return {
         t: CLOSE_REASON[o.closeReason] || '已结束',
@@ -283,9 +291,24 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
         <div class="sum-row"><span>车辆</span><span>{{ order.vehicle?.name }}</span></div>
         <div class="sum-row" style="border-bottom:0"><span>费用</span><span class="free">权益范围内，无额外费用</span></div>
         <button v-if="!order.evaluation" class="btn btn-primary" style="margin-top:14px" @click="router.push('/order/' + order.id + '/review')">评价本次服务</button>
-        <div v-else class="rated">
-          <span class="stars"><Icon v-for="n in 5" :key="n" name="star" :size="14" :style="{ color: n <= order.evaluation.rating ? '#D9A03C' : '#D8D3C8' }" /></span>
-          <span class="tiny muted">已评价</span>
+        <div v-else-if="order.evaluation.skipped" class="rated" style="justify-content:space-between">
+          <span class="tiny muted">已跳过评价</span>
+          <button class="rate-later" @click="router.push('/order/' + order.id + '/review')">补评价</button>
+        </div>
+        <div v-else class="eval">
+          <div class="ev-head">
+            <span class="ev-l">我的评价</span>
+            <span class="stars">
+              <Icon v-for="n in 5" :key="n" name="star" :size="14" :fill="n <= order.evaluation.rating"
+                :style="{ color: n <= order.evaluation.rating ? '#FF8A1F' : 'rgba(60,60,67,.22)' }" />
+            </span>
+            <span class="ev-t">{{ RATING_TEXT[order.evaluation.rating] }}</span>
+          </div>
+          <div v-if="order.evaluation.tags?.length" class="ev-tags">
+            <span v-for="t in order.evaluation.tags" :key="t" class="ev-tag">{{ tagLabel(t) }}</span>
+          </div>
+          <p v-if="order.evaluation.note" class="ev-note">{{ order.evaluation.note }}</p>
+          <div class="ev-time tiny muted num">{{ formatDateTime(order.evaluation.at) }}</div>
         </div>
       </div>
 
@@ -295,11 +318,14 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
         <div class="sum-row" style="border-bottom:0"><span>出行时间</span><span>{{ order.travelDate }} {{ order.travelTime }}</span></div>
       </div>
 
-      <div class="section-title"><span class="t">服务记录</span></div>
+      <div class="section-title"><span class="t">服务进度</span><span class="s">共 {{ order.timeline?.length || 0 }} 个节点</span></div>
       <section class="card tl-card">
-        <div v-for="(s, i) in (order.timeline || [])" :key="i" class="tl done">
+        <div v-for="(s, i) in (order.timeline || [])" :key="i" class="tl" :class="s.level === 'danger' ? 'danger' : s.level === 'warn' ? 'warn' : 'done'">
           <div class="tl-rail">
-            <span class="tl-dot"><Icon name="check" :size="11" /></span>
+            <span class="tl-dot" :class="s.level">
+              <Icon v-if="s.level !== 'danger' && s.level !== 'warn'" name="check" :size="11" />
+              <Icon v-else :size="11" :name="s.level === 'danger' ? 'close' : 'alert'" />
+            </span>
             <span v-if="i < order.timeline.length - 1" class="tl-line" />
           </div>
           <div class="tl-body">
@@ -455,8 +481,13 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .tl.doing .tl-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
 .tl.warn .tl-dot { border-color: transparent; background: var(--amber); }
 .tl.danger .tl-dot { border-color: transparent; background: var(--red); }
+.tl.danger .tl-dot, .tl.warn .tl-dot { color: #fff; }
+.tl.danger .tl-label { color: var(--red); }
 .tl-line { flex: 1; width: 1.5px; background: var(--line); min-height: 18px; margin: 3px 0; }
 .tl.done .tl-line { background: rgba(255, 122, 31, .3); }
+.tl-dot.warn { background: var(--amber); border-color: transparent; color: #fff; }
+.tl-dot.danger { background: var(--red); border-color: transparent; color: #fff; }
+.tl.warn .tl-label { color: var(--amber); }
 .tl-body { flex: 1; padding-bottom: 17px; min-width: 0; }
 .tl-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .tl-label { font-size: 14px; font-weight: 600; }
@@ -488,4 +519,15 @@ const vehicleIcon = computed(() => (order.value?.tripType === 'long' ? 'train' :
 .cancel-reasons { margin-top: 4px; }
 .cancel-done { padding: 40px; text-align: center; }
 .cd-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--green-tint); color: var(--green); display: grid; place-items: center; margin: 0 auto 12px; }
+
+.eval { margin-top: 14px; padding: 13px 14px; border-radius: 16px; background: var(--brand-tint); border: 1px solid var(--brand-line); }
+.ev-head { display: flex; align-items: center; gap: 8px; }
+.ev-l { font-size: 13px; font-weight: 700; color: var(--brand-ink); }
+.stars { display: inline-flex; gap: 1px; }
+.ev-t { font-size: 12px; color: var(--brand-ink); font-weight: 600; margin-left: auto; }
+.ev-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ev-tag { font-size: 11.5px; color: var(--brand-ink); background: rgba(255, 255, 255, .8); border: 1px solid var(--brand-line); padding: 3px 9px; border-radius: 10px; }
+.ev-note { font-size: 12.5px; color: var(--ink-2); line-height: 1.65; margin: 10px 0 0; }
+.ev-time { margin-top: 8px; }
+.rate-later { font-size: 12px; color: var(--brand-ink); font-weight: 600; padding: 4px 2px; }
 </style>

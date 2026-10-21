@@ -1,6 +1,6 @@
 <script setup>
 // 极简线性图标：统一 1.5 描边、24 网格，避免图标风格混杂
-const props = defineProps({ name: String, size: { type: [Number, String], default: 20 } })
+const props = defineProps({ name: String, size: { type: [Number, String], default: 20 }, fill: { type: Boolean, default: false } })
 const paths = {
   back: 'M15 5l-7 7 7 7',
   chevron: 'M9 6l6 6-6 6',
@@ -35,7 +35,7 @@ const paths = {
 </script>
 
 <template>
-  <svg :width="size" :height="size" viewBox="0 0 24 24" fill="none"
+  <svg :width="size" :height="size" viewBox="0 0 24 24" :fill="fill ? 'currentColor' : 'none'"
        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
        aria-hidden="true">
     <path :d="paths[name] || ''" />
